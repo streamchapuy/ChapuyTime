@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, forkJoin, map } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 
 import { OPENMETEO_FORECAST_API_URL, OPENMETEO_REVERSE_GEOCODING_API_URL } from '../config/openweather.config';
 
@@ -132,7 +132,9 @@ export class WeatherService {
 
     return forkJoin({
       forecast: this.http.get<OpenMeteoForecastResponse>(OPENMETEO_FORECAST_API_URL, { params: forecastParams }),
-      geocoding: this.http.get<OpenMeteoReverseGeocodingResponse>(OPENMETEO_REVERSE_GEOCODING_API_URL, { params: reverseParams })
+      geocoding: this.http.get<OpenMeteoReverseGeocodingResponse>(OPENMETEO_REVERSE_GEOCODING_API_URL, { params: reverseParams }).pipe(
+        catchError(() => of({ results: [] }))
+      )
     }).pipe(
       map(({ forecast, geocoding }) => {
         const current = forecast.current;
