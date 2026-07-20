@@ -221,8 +221,7 @@ export class WeatherService {
   }
 
   private formatLocation(result?: OpenMeteoReverseGeocodingResult): string {
-    const parts = [result?.name, result?.admin1, result?.country].filter((part): part is string => Boolean(part && part.trim().length > 0));
-    return parts.length > 0 ? parts.join(', ') : 'Tu ciudad';
+    return result?.name?.trim() || 'Tu ciudad';
   }
 
   private getIconUrl(iconName: string | undefined): string | null {
