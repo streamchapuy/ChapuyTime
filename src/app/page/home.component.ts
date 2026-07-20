@@ -17,6 +17,7 @@ export class HomeComponent implements OnInit {
 
   title = 'Nimbus';
   currentLocation = 'Obteniendo ubicacion precisa...';
+  currentCoordinatesLabel = '';
   currentTemperature: number | null = null;
   minTemperature: number | null = null;
   maxTemperature: number | null = null;
@@ -93,6 +94,42 @@ export class HomeComponent implements OnInit {
     return 'theme-default';
   }
 
+  get weatherOutlookLabel(): string {
+    const normalized = this.currentCondition.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+    if (normalized.includes('tormenta') || normalized.includes('thunder')) {
+      return 'Tormentoso';
+    }
+
+    if (normalized.includes('lluvia') || normalized.includes('rain') || normalized.includes('drizzle')) {
+      return 'Lluvioso';
+    }
+
+    if (normalized.includes('nieve') || normalized.includes('snow') || normalized.includes('sleet')) {
+      return 'Nevado';
+    }
+
+    if (
+      normalized.includes('nublado')
+      || normalized.includes('nuboso')
+      || normalized.includes('nubes')
+      || normalized.includes('cloud')
+      || normalized.includes('overcast')
+    ) {
+      return 'Nublado';
+    }
+
+    if (normalized.includes('despejado') || normalized.includes('clear') || normalized.includes('sun')) {
+      return 'Soleado';
+    }
+
+    if (this.isLoading) {
+      return 'Cargando';
+    }
+
+    return 'Sin datos';
+  }
+
   ngOnInit(): void {
     if (!this.weatherService.hasApiKey()) {
       this.errorMessage = 'Configura endpoint, host y X-RapidAPI-Key en src/app/config/openweather.config.ts';
@@ -110,10 +147,15 @@ export class HomeComponent implements OnInit {
 
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
+        const latitude = coords.latitude;
+        const longitude = coords.longitude;
+        const accuracyMeters = Math.round(coords.accuracy);
+
+        this.currentCoordinatesLabel = `Lat ${latitude.toFixed(5)} · Lon ${longitude.toFixed(5)} · Precision ±${accuracyMeters} m`;
         this.currentLocation = 'Ubicando...';
 
         this.weatherService
-          .getCurrentWeather(coords.latitude, coords.longitude)
+          .getCurrentWeather(latitude, longitude)
           .pipe(finalize(() => (this.isLoading = false)))
           .subscribe({
             next: (weather) => {
@@ -147,6 +189,7 @@ export class HomeComponent implements OnInit {
       () => {
         this.errorMessage = 'No fue posible obtener tu ubicacion actual.';
         this.currentCondition = 'Location unavailable';
+        this.currentCoordinatesLabel = '';
         this.weatherIconUrl = null;
         this.humidity = null;
         this.windSpeed = null;

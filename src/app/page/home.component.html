@@ -9,9 +9,12 @@
       </div>
 
       <h2 class="weather-city">{{ currentLocation }}</h2>
+      @if (currentCoordinatesLabel) {
+        <p class="location-meta">{{ currentCoordinatesLabel }}</p>
+      }
 
       <div class="weather-badges">
-        <span class="hero-chip">{{ currentCondition }}</span>
+        <span class="hero-chip">{{ weatherOutlookLabel }}</span>
         @if (maxTemperature !== null && minTemperature !== null) {
           <span class="hero-chip hero-chip-soft">H: {{ maxTemperature }}° · L: {{ minTemperature }}°</span>
         }

@@ -60,6 +60,9 @@ app-home .page {
 	--orb-color: rgba(255, 244, 176, 0.64);
 	--cloud-color: rgba(255, 255, 255, 0.38);
 	--rain-opacity: 0;
+	--icon-glow: rgba(255, 195, 92, 0.44);
+	--icon-chip: rgba(255, 255, 255, 0.2);
+	--icon-fg: #ffd66d;
 
 	position: relative;
 	overflow: hidden;
@@ -157,6 +160,9 @@ app-home .page.theme-default {
 	--details-bottom: #286696;
 	--orb-color: rgba(255, 244, 176, 0.28);
 	--cloud-color: rgba(255, 255, 255, 0.16);
+	--icon-glow: rgba(255, 195, 92, 0.44);
+	--icon-chip: rgba(255, 255, 255, 0.22);
+	--icon-fg: #ffd66d;
 }
 
 app-home .page.theme-clear {
@@ -166,6 +172,9 @@ app-home .page.theme-clear {
 	--details-bottom: #2a80bb;
 	--orb-color: rgba(255, 245, 186, 0.3);
 	--cloud-color: rgba(255, 255, 255, 0.14);
+	--icon-glow: rgba(255, 194, 78, 0.52);
+	--icon-chip: rgba(255, 255, 255, 0.24);
+	--icon-fg: #ffd05b;
 }
 
 app-home .page.theme-cloudy {
@@ -175,6 +184,9 @@ app-home .page.theme-cloudy {
 	--details-bottom: #5d788d;
 	--orb-color: rgba(255, 255, 255, 0.5);
 	--cloud-color: rgba(245, 251, 255, 0.62);
+	--icon-glow: rgba(186, 224, 255, 0.42);
+	--icon-chip: rgba(255, 255, 255, 0.2);
+	--icon-fg: #a9d7ff;
 }
 
 app-home .page.theme-rain {
@@ -185,6 +197,9 @@ app-home .page.theme-rain {
 	--orb-color: rgba(184, 224, 255, 0.4);
 	--cloud-color: rgba(232, 243, 255, 0.48);
 	--rain-opacity: 0.5;
+	--icon-glow: rgba(123, 205, 255, 0.42);
+	--icon-chip: rgba(255, 255, 255, 0.16);
+	--icon-fg: #87d2ff;
 }
 
 app-home .page.theme-storm {
@@ -195,6 +210,9 @@ app-home .page.theme-storm {
 	--orb-color: rgba(205, 220, 255, 0.44);
 	--cloud-color: rgba(238, 246, 255, 0.52);
 	--rain-opacity: 0.64;
+	--icon-glow: rgba(173, 156, 255, 0.5);
+	--icon-chip: rgba(255, 255, 255, 0.16);
+	--icon-fg: #b6a9ff;
 }
 
 app-home .page.theme-snow {
@@ -204,6 +222,9 @@ app-home .page.theme-snow {
 	--details-bottom: #6f95ae;
 	--orb-color: rgba(255, 255, 255, 0.54);
 	--cloud-color: rgba(255, 255, 255, 0.38);
+	--icon-glow: rgba(206, 236, 255, 0.5);
+	--icon-chip: rgba(255, 255, 255, 0.26);
+	--icon-fg: #d4eeff;
 }
 
 app-home .page.theme-storm {
@@ -332,6 +353,15 @@ app-home .weather-city {
 	letter-spacing: -0.05em;
 }
 
+app-home .location-meta {
+	margin: 8px 0 0;
+	font-size: 0.74rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: rgba(235, 245, 255, 0.88);
+	opacity: 0.9;
+}
+
 app-home .weather-temp-row {
 	position: relative;
 	display: flex;
@@ -352,8 +382,18 @@ app-home .weather-temp {
 app-home .weather-icon {
 	width: 66px;
 	height: 66px;
+	padding: 6px;
+	border-radius: 50%;
+	background:
+		radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 54%),
+		linear-gradient(180deg, var(--icon-chip) 0%, rgba(255, 255, 255, 0.05) 100%);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 	object-fit: contain;
-	filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.22));
+	filter:
+		saturate(1.75)
+		contrast(1.1)
+		drop-shadow(0 0 12px var(--icon-glow))
+		drop-shadow(0 4px 12px rgba(0, 0, 0, 0.28));
 }
 
 app-home .weather-sun {
@@ -361,7 +401,8 @@ app-home .weather-sun {
 	display: inline-block;
 	width: 42px;
 	height: 42px;
-	border: 2.5px solid rgba(244, 248, 251, 0.88);
+	border: 2.5px solid var(--icon-fg);
+	box-shadow: 0 0 10px var(--icon-glow);
 	border-radius: 50%;
 }
 
@@ -374,7 +415,7 @@ app-home .weather-sun::after {
 	height: 2.5px;
 	margin-left: -29px;
 	margin-top: -1.25px;
-	background: rgba(244, 248, 251, 0.88);
+	background: var(--icon-fg);
 }
 
 app-home .weather-sun::after {
@@ -559,12 +600,24 @@ app-home .forecast-hour {
 app-home .forecast-icon {
 	width: 30px;
 	height: 30px;
+	padding: 3px;
+	border-radius: 50%;
+	background:
+		radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 58%),
+		linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.08) 100%);
+	border: 1px solid rgba(255, 255, 255, 0.16);
 	object-fit: contain;
+	filter:
+		saturate(1.68)
+		contrast(1.08)
+		drop-shadow(0 0 7px var(--icon-glow));
 }
 
 app-home .forecast-fallback {
 	font-size: 1.25rem;
-	opacity: 0.7;
+	opacity: 1;
+	color: var(--icon-fg);
+	text-shadow: 0 0 8px var(--icon-glow);
 }
 
 app-home .forecast-item strong {
