@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, forkJoin, map } from 'rxjs';
 
-import { OPENMETEO_FORECAST_API_URL } from '../config/openweather.config';
+import { OPENMETEO_FORECAST_API_URL, OPENMETEO_REVERSE_GEOCODING_API_URL } from '../config/openweather.config';
 
 interface OpenMeteoForecastResponse {
   current?: {
@@ -39,6 +39,20 @@ interface OpenMeteoUvResponse {
   current?: {
     uv_index?: number;
   };
+}
+
+interface OpenMeteoReverseGeocodingResponse {
+  results?: Array<{
+    name?: string;
+    admin1?: string;
+    country?: string;
+  }>;
+}
+
+interface OpenMeteoReverseGeocodingResult {
+  name?: string;
+  admin1?: string;
+  country?: string;
 }
 
 export interface HourlyForecast {
@@ -101,7 +115,7 @@ export class WeatherService {
   };
 
   getCurrentWeather(lat: number, lon: number): Observable<WeatherSnapshot> {
-    const params = new HttpParams()
+    const forecastParams = new HttpParams()
       .set('latitude', lat)
       .set('longitude', lon)
       .set('timezone', 'auto')
@@ -110,8 +124,17 @@ export class WeatherService {
       .set('daily', 'temperature_2m_max,temperature_2m_min')
       .set('forecast_days', '2');
 
-    return this.http.get<OpenMeteoForecastResponse>(OPENMETEO_FORECAST_API_URL, { params }).pipe(
-      map((forecast) => {
+    const reverseParams = new HttpParams()
+      .set('latitude', lat)
+      .set('longitude', lon)
+      .set('count', '1')
+      .set('language', 'es');
+
+    return forkJoin({
+      forecast: this.http.get<OpenMeteoForecastResponse>(OPENMETEO_FORECAST_API_URL, { params: forecastParams }),
+      geocoding: this.http.get<OpenMeteoReverseGeocodingResponse>(OPENMETEO_REVERSE_GEOCODING_API_URL, { params: reverseParams })
+    }).pipe(
+      map(({ forecast, geocoding }) => {
         const current = forecast.current;
         const windDirectionDegrees = this.normalizeDegrees(current?.wind_direction_10m);
         const currentTime = current?.time ?? null;
@@ -119,7 +142,7 @@ export class WeatherService {
         const currentDescriptor = this.getWeatherDescriptor(current?.weather_code, current?.is_day);
 
         return {
-          location: 'Tu ubicacion actual',
+          location: this.formatLocation(geocoding.results?.[0]),
           temperature: this.toRoundedValue(current?.temperature_2m),
           minTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_min?.[0]),
           maxTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_max?.[0]),
@@ -195,6 +218,11 @@ export class WeatherService {
     }
 
     return descriptor;
+  }
+
+  private formatLocation(result?: OpenMeteoReverseGeocodingResult): string {
+    const parts = [result?.name, result?.admin1, result?.country].filter((part): part is string => Boolean(part && part.trim().length > 0));
+    return parts.length > 0 ? parts.join(', ') : 'Tu ciudad';
   }
 
   private getIconUrl(iconName: string | undefined): string | null {
