@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 
-import { OPENMETEO_FORECAST_API_URL, OPENMETEO_REVERSE_GEOCODING_API_URL } from '../config/openweather.config';
+import { NOMINATIM_REVERSE_GEOCODING_API_URL, OPENMETEO_FORECAST_API_URL } from '../config/openweather.config';
 
 interface OpenMeteoForecastResponse {
   current?: {
@@ -41,18 +41,16 @@ interface OpenMeteoUvResponse {
   };
 }
 
-interface OpenMeteoReverseGeocodingResponse {
-  results?: Array<{
-    name?: string;
-    admin1?: string;
-    country?: string;
-  }>;
-}
-
-interface OpenMeteoReverseGeocodingResult {
-  name?: string;
-  admin1?: string;
-  country?: string;
+interface NominatimReverseGeocodingResponse {
+  address?: {
+    city?: string;
+    town?: string;
+    village?: string;
+    municipality?: string;
+    hamlet?: string;
+    suburb?: string;
+    county?: string;
+  };
 }
 
 export interface HourlyForecast {
@@ -125,15 +123,17 @@ export class WeatherService {
       .set('forecast_days', '2');
 
     const reverseParams = new HttpParams()
-      .set('latitude', lat)
-      .set('longitude', lon)
-      .set('count', '1')
-      .set('language', 'es');
+      .set('format', 'jsonv2')
+      .set('lat', lat)
+      .set('lon', lon)
+      .set('zoom', '10')
+      .set('addressdetails', '1')
+      .set('accept-language', 'es');
 
     return forkJoin({
       forecast: this.http.get<OpenMeteoForecastResponse>(OPENMETEO_FORECAST_API_URL, { params: forecastParams }),
-      geocoding: this.http.get<OpenMeteoReverseGeocodingResponse>(OPENMETEO_REVERSE_GEOCODING_API_URL, { params: reverseParams }).pipe(
-        catchError(() => of({ results: [] }))
+      geocoding: this.http.get<NominatimReverseGeocodingResponse>(NOMINATIM_REVERSE_GEOCODING_API_URL, { params: reverseParams }).pipe(
+        catchError(() => of({ address: undefined } as NominatimReverseGeocodingResponse))
       )
     }).pipe(
       map(({ forecast, geocoding }) => {
@@ -144,7 +144,7 @@ export class WeatherService {
         const currentDescriptor = this.getWeatherDescriptor(current?.weather_code, current?.is_day);
 
         return {
-          location: this.formatLocation(geocoding.results?.[0]),
+          location: this.formatLocation(geocoding.address),
           temperature: this.toRoundedValue(current?.temperature_2m),
           minTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_min?.[0]),
           maxTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_max?.[0]),
@@ -222,8 +222,17 @@ export class WeatherService {
     return descriptor;
   }
 
-  private formatLocation(result?: OpenMeteoReverseGeocodingResult): string {
-    return result?.name?.trim() || 'Tu ciudad';
+  private formatLocation(address?: NominatimReverseGeocodingResponse['address']): string {
+    return (
+      address?.city?.trim()
+      || address?.town?.trim()
+      || address?.village?.trim()
+      || address?.municipality?.trim()
+      || address?.hamlet?.trim()
+      || address?.suburb?.trim()
+      || address?.county?.trim()
+      || 'Tu ciudad'
+    );
   }
 
   private getIconUrl(iconName: string | undefined): string | null {
