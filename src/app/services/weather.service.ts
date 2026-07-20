@@ -44,6 +44,10 @@ export interface HourlyForecast {
   hour: string;
   temperature: number;
   iconUrl: string | null;
+  condition: string;
+  humidity: number | null;
+  windSpeed: number | null;
+  rainProbability: number | null;
 }
 
 export interface WeatherSnapshot {
@@ -89,7 +93,11 @@ export class WeatherService {
           .map((item) => ({
             hour: this.getHourLabel(item.dt_txt),
             temperature: this.toCelsius(item.main?.temp),
-            iconUrl: this.getIconUrl(item.weather[0]?.icon)
+            iconUrl: this.getIconUrl(item.weather[0]?.icon),
+            condition: this.translateCondition(item.weather[0]?.description),
+            humidity: item.main?.humidity ?? null,
+            windSpeed: this.toKmPerHour(item.wind?.speed),
+            rainProbability: this.toPercentage((item as { pop?: number }).pop)
           }));
 
         return {
@@ -171,6 +179,14 @@ export class WeatherService {
     }
 
     return Math.round(windSpeedMs * 3.6);
+  }
+
+  private toPercentage(value: number | undefined): number | null {
+    if (value === undefined || Number.isNaN(value)) {
+      return null;
+    }
+
+    return Math.round(value * 100);
   }
 
   private toCardinalDirection(degrees: number | null): string | null {

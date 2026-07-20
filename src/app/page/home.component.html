@@ -9,9 +9,6 @@
       </div>
 
       <h2 class="weather-city">{{ currentLocation }}</h2>
-      @if (currentCoordinatesLabel) {
-        <p class="location-meta">{{ currentCoordinatesLabel }}</p>
-      }
 
       <div class="weather-badges">
         <span class="hero-chip">{{ weatherOutlookLabel }}</span>
@@ -56,18 +53,45 @@
     <article class="detail-card detail-forecast24h glass-card feature-panel">
       <div class="panel-head">
         <h3>24-HOUR FORECAST</h3>
-        <span>Next hours</span>
+        <span>{{ next24hDominantCondition }}</span>
       </div>
-      <div class="forecast-strip">
-        @for (item of forecastPreview; track $index; let i = $index) {
-          <div class="forecast-item" [class.is-now]="i === 0">
-            <span class="forecast-hour">{{ i === 0 ? 'Now' : item.hour }}</span>
-            @if (item.iconUrl) {
-              <img [src]="item.iconUrl" alt="icono clima" class="forecast-icon" />
-            } @else {
-              <span class="forecast-fallback">-</span>
-            }
-            <strong>{{ item.temperature }}°</strong>
+      <div class="forecast-summary-row">
+        <div class="forecast-summary-chip">
+          <span>Min</span>
+          <strong>{{ next24hMinTemperature !== null ? next24hMinTemperature + '°' : '--' }}</strong>
+        </div>
+        <div class="forecast-summary-chip">
+          <span>Max</span>
+          <strong>{{ next24hMaxTemperature !== null ? next24hMaxTemperature + '°' : '--' }}</strong>
+        </div>
+        <div class="forecast-summary-chip">
+          <span>Tramo</span>
+          <strong>cada 3h</strong>
+        </div>
+      </div>
+
+      <div class="forecast-list">
+        @for (item of forecast24h; track item.hour; let i = $index) {
+          <div class="forecast-row" [class.is-now]="i === 0">
+            <div class="forecast-time-block">
+              <span class="forecast-hour">{{ i === 0 ? 'Ahora' : item.hour }}</span>
+              <small>{{ item.condition }}</small>
+            </div>
+
+            <div class="forecast-icon-block">
+              @if (item.iconUrl) {
+                <img [src]="item.iconUrl" alt="icono clima" class="forecast-icon" />
+              } @else {
+                <span class="forecast-fallback">-</span>
+              }
+              <strong>{{ item.temperature }}°</strong>
+            </div>
+
+            <div class="forecast-meta-block">
+              <span>Humedad {{ item.humidity !== null ? item.humidity + '%' : '--' }}</span>
+              <span>Viento {{ item.windSpeed !== null ? item.windSpeed + ' km/h' : '--' }}</span>
+              <span>Lluvia {{ item.rainProbability !== null ? item.rainProbability + '%' : '--' }}</span>
+            </div>
           </div>
         }
       </div>

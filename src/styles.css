@@ -353,15 +353,6 @@ app-home .weather-city {
 	letter-spacing: -0.05em;
 }
 
-app-home .location-meta {
-	margin: 8px 0 0;
-	font-size: 0.74rem;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	color: rgba(235, 245, 255, 0.88);
-	opacity: 0.9;
-}
-
 app-home .weather-temp-row {
 	position: relative;
 	display: flex;
@@ -562,33 +553,75 @@ app-home .detail-forecast24h {
 	padding: 10px;
 }
 
-app-home .forecast-strip {
-	margin-top: 8px;
+app-home .forecast-summary-row {
 	display: grid;
-	grid-auto-flow: column;
-	grid-auto-columns: minmax(74px, 1fr);
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 8px;
-	overflow-x: auto;
-	padding-bottom: 4px;
-	scroll-snap-type: x proximity;
+	margin-top: 10px;
 }
 
-app-home .forecast-item {
-	display: flex;
-	flex-direction: column;
+app-home .forecast-summary-chip {
+	padding: 10px;
+	border-radius: 16px;
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	text-align: center;
+}
+
+app-home .forecast-summary-chip span {
+	display: block;
+	font-size: 0.62rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	opacity: 0.72;
+}
+
+app-home .forecast-summary-chip strong {
+	display: block;
+	margin-top: 6px;
+	font-size: 0.95rem;
+	font-family: 'Space Grotesk', sans-serif;
+}
+
+app-home .forecast-list {
+	margin-top: 10px;
+	display: grid;
+	gap: 8px;
+}
+
+app-home .forecast-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1.1fr) auto minmax(0, 1fr);
 	align-items: center;
-	gap: 5px;
-	padding: 9px 8px;
+	gap: 10px;
+	padding: 10px 12px;
 	border-radius: 18px;
 	background: rgba(255, 255, 255, 0.08);
 	border: 1px solid rgba(255, 255, 255, 0.08);
-	scroll-snap-align: start;
 }
 
-app-home .forecast-item.is-now {
-	padding: 12px 8px;
+app-home .forecast-row.is-now {
 	background: rgba(255, 255, 255, 0.16);
 	border-color: rgba(255, 255, 255, 0.18);
+}
+
+app-home .forecast-time-block,
+app-home .forecast-meta-block {
+	display: grid;
+	gap: 3px;
+}
+
+app-home .forecast-time-block small,
+app-home .forecast-meta-block span {
+	font-size: 0.75rem;
+	line-height: 1.25;
+	color: rgba(240, 247, 255, 0.82);
+}
+
+app-home .forecast-icon-block {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 
 app-home .forecast-hour {
@@ -704,6 +737,10 @@ app-home .install-button:disabled {
 }
 
 @media (min-width: 721px) {
+	app-home .forecast-row {
+		grid-template-columns: minmax(140px, 1fr) auto minmax(170px, 1fr);
+	}
+
 	app-home .install-cta {
 		padding: 0 20px 32px;
 	}
