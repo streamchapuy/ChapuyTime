@@ -113,4 +113,19 @@
       <p class="detail-subtitle">Direccion: {{ windDirection ?? '--' }}</p>
     </article>
   </section>
+
+  @if (isInstallPromptVisible) {
+    <section class="install-cta shell" aria-label="Instalar aplicacion">
+      <article class="install-card glass-card">
+        <div>
+          <p class="install-eyebrow">Nimbus App</p>
+          <h3>Descarga esta app en tu celular</h3>
+          <p class="install-copy">Instalala para abrir Nimbus desde tu pantalla de inicio y consultar el clima mas rapido.</p>
+        </div>
+        <button class="install-button" type="button" (click)="installApp()" [disabled]="!canInstallApp">
+          {{ canInstallApp ? 'Descargar app' : 'Disponible desde el navegador compatible' }}
+        </button>
+      </article>
+    </section>
+  }
 </main>

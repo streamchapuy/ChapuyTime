@@ -1,9 +1,17 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 
 import { HeaderComponent } from '../Component/header.component';
 import { HourlyForecast, WeatherService } from '../services/weather.service';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+}
 
 @Component({
   selector: 'app-home',
@@ -14,6 +22,7 @@ import { HourlyForecast, WeatherService } from '../services/weather.service';
 })
 export class HomeComponent implements OnInit {
   private readonly weatherService = inject(WeatherService);
+  private deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
 
   title = 'Nimbus';
   currentLocation = 'Obteniendo ubicacion precisa...';
@@ -31,6 +40,8 @@ export class HomeComponent implements OnInit {
   forecast24h: HourlyForecast[] = [];
   errorMessage = '';
   isLoading = true;
+  canInstallApp = false;
+  isInstallPromptVisible = false;
 
   get forecastPreview(): HourlyForecast[] {
     return this.forecast24h.slice(0, 4);
@@ -130,7 +141,24 @@ export class HomeComponent implements OnInit {
     return 'Sin datos';
   }
 
+  @HostListener('window:beforeinstallprompt', ['$event'])
+  onBeforeInstallPrompt(event: Event): void {
+    event.preventDefault();
+    this.deferredInstallPrompt = event as BeforeInstallPromptEvent;
+    this.canInstallApp = true;
+    this.isInstallPromptVisible = true;
+  }
+
+  @HostListener('window:appinstalled')
+  onAppInstalled(): void {
+    this.deferredInstallPrompt = null;
+    this.canInstallApp = false;
+    this.isInstallPromptVisible = false;
+  }
+
   ngOnInit(): void {
+    this.isInstallPromptVisible = !this.isRunningStandalone();
+
     if (!this.weatherService.hasApiKey()) {
       this.errorMessage = 'Configura endpoint, host y X-RapidAPI-Key en src/app/config/openweather.config.ts';
       this.currentCondition = 'RapidAPI config missing';
@@ -205,6 +233,28 @@ export class HomeComponent implements OnInit {
         maximumAge: 0
       }
     );
+  }
+
+  async installApp(): Promise<void> {
+    if (!this.deferredInstallPrompt) {
+      return;
+    }
+
+    await this.deferredInstallPrompt.prompt();
+    const { outcome } = await this.deferredInstallPrompt.userChoice;
+
+    if (outcome === 'accepted') {
+      this.canInstallApp = false;
+      this.isInstallPromptVisible = false;
+    }
+
+    this.deferredInstallPrompt = null;
+  }
+
+  private isRunningStandalone(): boolean {
+    const standaloneDisplay = window.matchMedia('(display-mode: standalone)').matches;
+    const iosStandalone = 'standalone' in navigator && Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+    return standaloneDisplay || iosStandalone;
   }
 
   private resolveErrorMessage(error: HttpErrorResponse): string {
