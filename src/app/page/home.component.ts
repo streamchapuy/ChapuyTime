@@ -199,8 +199,8 @@ export class HomeComponent implements OnInit {
     this.isInstallPromptVisible = !this.isRunningStandalone();
 
     if (!this.weatherService.hasApiKey()) {
-      this.errorMessage = 'Configura endpoint, host y X-RapidAPI-Key en src/app/config/openweather.config.ts';
-      this.currentCondition = 'RapidAPI config missing';
+      this.errorMessage = 'No se encontro configurado el endpoint de Open-Meteo.';
+      this.currentCondition = 'Weather config missing';
       this.isLoading = false;
       return;
     }
@@ -293,10 +293,6 @@ export class HomeComponent implements OnInit {
   }
 
   private resolveErrorMessage(error: HttpErrorResponse): string {
-    if (error.status === 403) {
-      return 'RapidAPI respondio 403: no estas suscrito a esta API o la clave no tiene acceso.';
-    }
-
     if (typeof error.error === 'string' && error.error.trim().length > 0) {
       return error.error;
     }
@@ -306,6 +302,6 @@ export class HomeComponent implements OnInit {
       return apiMessage;
     }
 
-    return 'No se pudo consultar OpenWeather via RapidAPI.';
+    return 'No se pudo consultar Open-Meteo.';
   }
 }

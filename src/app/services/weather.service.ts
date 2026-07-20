@@ -1,37 +1,38 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable, map } from 'rxjs';
 
-import {
-  OPENMETEO_UV_API_URL,
-  OPENWEATHER_API_URL,
-  OPENWEATHER_RAPIDAPI_HOST,
-  OPENWEATHER_RAPIDAPI_KEY
-} from '../config/openweather.config';
+import { OPENMETEO_FORECAST_API_URL } from '../config/openweather.config';
 
-interface OpenWeatherForecastResponse {
-  city: {
-    name: string;
+interface OpenMeteoForecastResponse {
+  current?: {
+    temperature_2m?: number;
+    relative_humidity_2m?: number;
+    weather_code?: number;
+    wind_speed_10m?: number;
+    wind_direction_10m?: number;
+    uv_index?: number;
+    is_day?: number;
+    time?: string;
   };
-  list: Array<{
-    dt_txt?: string;
-    weather: Array<{
-      main: string;
-      description: string;
-      icon?: string;
-    }>;
-    main: {
-      temp: number;
-      temp_min: number;
-      temp_max: number;
-      humidity?: number;
-    };
-    wind?: {
-      speed?: number;
-      deg?: number;
-    };
-  }>;
+  hourly?: {
+    time?: string[];
+    temperature_2m?: number[];
+    relative_humidity_2m?: number[];
+    weather_code?: number[];
+    wind_speed_10m?: number[];
+    precipitation_probability?: number[];
+    is_day?: number[];
+  };
+  daily?: {
+    temperature_2m_max?: number[];
+    temperature_2m_min?: number[];
+  };
+}
+
+interface WeatherCodeDescriptor {
+  label: string;
+  iconName: string;
 }
 
 interface OpenMeteoUvResponse {
@@ -68,50 +69,67 @@ export interface WeatherSnapshot {
 @Injectable({ providedIn: 'root' })
 export class WeatherService {
   private readonly http = inject(HttpClient);
+  private readonly weatherCodeMap: Record<number, WeatherCodeDescriptor> = {
+    0: { label: 'cielo despejado', iconName: 'clear-day' },
+    1: { label: 'mayormente despejado', iconName: 'partly-cloudy-day' },
+    2: { label: 'parcialmente nublado', iconName: 'partly-cloudy-day' },
+    3: { label: 'nublado', iconName: 'overcast-day' },
+    45: { label: 'niebla', iconName: 'fog-day' },
+    48: { label: 'niebla escarchada', iconName: 'fog-day' },
+    51: { label: 'llovizna ligera', iconName: 'drizzle' },
+    53: { label: 'llovizna', iconName: 'drizzle' },
+    55: { label: 'llovizna intensa', iconName: 'extreme-drizzle' },
+    56: { label: 'llovizna helada ligera', iconName: 'sleet' },
+    57: { label: 'llovizna helada', iconName: 'sleet' },
+    61: { label: 'lluvia ligera', iconName: 'rain' },
+    63: { label: 'lluvia', iconName: 'rain' },
+    65: { label: 'lluvia intensa', iconName: 'extreme-rain' },
+    66: { label: 'lluvia helada ligera', iconName: 'sleet' },
+    67: { label: 'lluvia helada', iconName: 'sleet' },
+    71: { label: 'nieve ligera', iconName: 'snow' },
+    73: { label: 'nieve', iconName: 'snow' },
+    75: { label: 'nieve intensa', iconName: 'extreme-snow' },
+    77: { label: 'granos de nieve', iconName: 'hail' },
+    80: { label: 'chubascos ligeros', iconName: 'rain' },
+    81: { label: 'chubascos', iconName: 'rain' },
+    82: { label: 'chubascos intensos', iconName: 'extreme-rain' },
+    85: { label: 'chubascos de nieve', iconName: 'snow' },
+    86: { label: 'chubascos de nieve intensos', iconName: 'extreme-snow' },
+    95: { label: 'tormenta', iconName: 'thunderstorms-rain' },
+    96: { label: 'tormenta con granizo', iconName: 'thunderstorms-extreme-rain' },
+    99: { label: 'tormenta fuerte con granizo', iconName: 'thunderstorms-extreme-rain' }
+  };
 
   getCurrentWeather(lat: number, lon: number): Observable<WeatherSnapshot> {
     const params = new HttpParams()
       .set('latitude', lat)
       .set('longitude', lon)
-      .set('lang', 'es');
+      .set('timezone', 'auto')
+      .set('current', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day')
+      .set('hourly', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation_probability,is_day')
+      .set('daily', 'temperature_2m_max,temperature_2m_min')
+      .set('forecast_days', '2');
 
-    const headers = new HttpHeaders({
-      'x-rapidapi-key': OPENWEATHER_RAPIDAPI_KEY,
-      'x-rapidapi-host': OPENWEATHER_RAPIDAPI_HOST,
-      'Content-Type': 'application/json'
-    });
-
-    const forecast$ = this.http.get<OpenWeatherForecastResponse>(OPENWEATHER_API_URL, { headers, params });
-    const uv$ = this.getUvIndex(lat, lon);
-
-    return forkJoin({ forecast: forecast$, uvIndex: uv$ }).pipe(
-      map(({ forecast, uvIndex }) => {
-        const currentForecast = forecast.list[0];
-        const windDirectionDegrees = this.normalizeDegrees(currentForecast?.wind?.deg);
-        const hourly24h = forecast.list
-          .slice(0, 8)
-          .map((item) => ({
-            hour: this.getHourLabel(item.dt_txt),
-            temperature: this.toCelsius(item.main?.temp),
-            iconUrl: this.getIconUrl(item.weather[0]?.icon),
-            condition: this.translateCondition(item.weather[0]?.description),
-            humidity: item.main?.humidity ?? null,
-            windSpeed: this.toKmPerHour(item.wind?.speed),
-            rainProbability: this.toPercentage((item as { pop?: number }).pop)
-          }));
+    return this.http.get<OpenMeteoForecastResponse>(OPENMETEO_FORECAST_API_URL, { params }).pipe(
+      map((forecast) => {
+        const current = forecast.current;
+        const windDirectionDegrees = this.normalizeDegrees(current?.wind_direction_10m);
+        const currentTime = current?.time ?? null;
+        const hourly24h = this.buildHourlyForecast(forecast, currentTime);
+        const currentDescriptor = this.getWeatherDescriptor(current?.weather_code, current?.is_day);
 
         return {
-          location: forecast.city.name,
-          temperature: this.toCelsius(currentForecast?.main.temp),
-          minTemperature: this.toCelsius(currentForecast?.main.temp_min),
-          maxTemperature: this.toCelsius(currentForecast?.main.temp_max),
-          condition: this.translateCondition(currentForecast?.weather[0]?.description),
-          iconUrl: this.getIconUrl(currentForecast?.weather[0]?.icon),
-          humidity: currentForecast?.main.humidity ?? null,
-          windSpeed: this.toKmPerHour(currentForecast?.wind?.speed),
+          location: 'Tu ubicacion actual',
+          temperature: this.toRoundedValue(current?.temperature_2m),
+          minTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_min?.[0]),
+          maxTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_max?.[0]),
+          condition: currentDescriptor.label,
+          iconUrl: this.getIconUrl(currentDescriptor.iconName),
+          humidity: current?.relative_humidity_2m ?? null,
+          windSpeed: this.toRoundedValue(current?.wind_speed_10m),
           windDirection: this.toCardinalDirection(windDirectionDegrees),
           windDirectionDegrees,
-          uvIndex,
+          uvIndex: this.toNullableDecimal(current?.uv_index),
           hourly24h
         };
       })
@@ -119,66 +137,72 @@ export class WeatherService {
   }
 
   hasApiKey(): boolean {
-    return OPENWEATHER_RAPIDAPI_KEY.trim().length > 0
-      && OPENWEATHER_RAPIDAPI_HOST.trim().length > 0
-      && OPENWEATHER_API_URL.trim().length > 0;
+    return OPENMETEO_FORECAST_API_URL.trim().length > 0;
   }
 
-  private getUvIndex(lat: number, lon: number): Observable<number | null> {
-    const params = new HttpParams()
-      .set('latitude', lat)
-      .set('longitude', lon)
-      .set('current', 'uv_index');
+  private buildHourlyForecast(forecast: OpenMeteoForecastResponse, currentTime: string | null): HourlyForecast[] {
+    const times = forecast.hourly?.time ?? [];
+    const startIndex = currentTime ? Math.max(0, times.findIndex((time) => time >= currentTime)) : 0;
 
-    return this.http.get<OpenMeteoUvResponse>(OPENMETEO_UV_API_URL, { params }).pipe(
-      map((response) => {
-        const uvIndex = response.current?.uv_index;
-        return typeof uvIndex === 'number' ? Math.round(uvIndex * 10) / 10 : null;
-      }),
-      catchError(() => of(null))
-    );
+    return times.slice(startIndex, startIndex + 8).map((time, index) => {
+      const absoluteIndex = startIndex + index;
+      const weatherDescriptor = this.getWeatherDescriptor(
+        forecast.hourly?.weather_code?.[absoluteIndex],
+        forecast.hourly?.is_day?.[absoluteIndex]
+      );
+
+      return {
+        hour: this.getHourLabel(time),
+        temperature: this.toRoundedValue(forecast.hourly?.temperature_2m?.[absoluteIndex]),
+        iconUrl: this.getIconUrl(weatherDescriptor.iconName),
+        condition: weatherDescriptor.label,
+        humidity: forecast.hourly?.relative_humidity_2m?.[absoluteIndex] ?? null,
+        windSpeed: this.toRoundedValue(forecast.hourly?.wind_speed_10m?.[absoluteIndex]),
+        rainProbability: forecast.hourly?.precipitation_probability?.[absoluteIndex] ?? null
+      };
+    });
   }
 
-  private toCelsius(temperature: number | undefined): number {
-    if (temperature === undefined) {
+  private toRoundedValue(value: number | undefined): number {
+    if (value === undefined) {
       return 0;
     }
 
-    const normalized = temperature > 200 ? temperature - 273.15 : temperature;
-    return Math.round(normalized);
+    return Math.round(value);
   }
 
-  private translateCondition(description: string | undefined): string {
-    if (!description) {
-      return 'Desconocido';
-    }
-
-    const dictionary: Record<string, string> = {
-      'overcast clouds': 'nublado',
-      'broken clouds': 'nubes dispersas',
-      'scattered clouds': 'nubes aisladas',
-      'few clouds': 'pocas nubes',
-      'clear sky': 'cielo despejado'
-    };
-
-    const normalized = description.trim().toLowerCase();
-    return dictionary[normalized] ?? description;
-  }
-
-  private getIconUrl(iconCode: string | undefined): string | null {
-    if (!iconCode) {
+  private toNullableDecimal(value: number | undefined): number | null {
+    if (value === undefined || Number.isNaN(value)) {
       return null;
     }
 
-    return `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+    return Math.round(value * 10) / 10;
   }
 
-  private toKmPerHour(windSpeedMs: number | undefined): number | null {
-    if (windSpeedMs === undefined) {
+  private getWeatherDescriptor(weatherCode: number | undefined, isDay: number | undefined): WeatherCodeDescriptor {
+    const fallback = this.weatherCodeMap[0];
+    const descriptor = weatherCode !== undefined ? this.weatherCodeMap[weatherCode] : undefined;
+
+    if (!descriptor) {
+      return fallback;
+    }
+
+    if (isDay === 0 && descriptor.iconName.endsWith('-day')) {
+      return {
+        ...descriptor,
+        iconName: descriptor.iconName.replace('-day', '-night')
+      };
+    }
+
+    return descriptor;
+  }
+
+  private getIconUrl(iconName: string | undefined): string | null {
+    if (!iconName) {
       return null;
     }
 
-    return Math.round(windSpeedMs * 3.6);
+    return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons/production/fill/all/${iconName}.svg`;
   }
 
   private toPercentage(value: number | undefined): number | null {
@@ -212,7 +236,7 @@ export class WeatherService {
       return '--:--';
     }
 
-    const match = dateText.match(/\d{2}:\d{2}/);
-    return match ? match[0] : '--:--';
+    const match = dateText.match(/(?:T|\s)(\d{2}:\d{2})/);
+    return match ? match[1] : '--:--';
   }
 }
