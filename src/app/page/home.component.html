@@ -1,0 +1,113 @@
+<app-header [title]="title"></app-header>
+
+<main class="page" [class]="'page ' + weatherThemeClass">
+  <section class="weather-main shell" aria-label="Clima actual">
+    <article class="weather-card hero-card">
+      <div class="hero-topline">
+        <p class="weather-label">Ubicacion Actual</p>
+        <span class="live-pill">Live</span>
+      </div>
+
+      <h2 class="weather-city">{{ currentLocation }}</h2>
+
+      <div class="weather-badges">
+        <span class="hero-chip">{{ currentCondition }}</span>
+        @if (maxTemperature !== null && minTemperature !== null) {
+          <span class="hero-chip hero-chip-soft">H: {{ maxTemperature }}° · L: {{ minTemperature }}°</span>
+        }
+      </div>
+
+      <div class="weather-temp-row">
+        <strong class="weather-temp">
+          {{ currentTemperature !== null ? currentTemperature + '°' : '--' }}
+        </strong>
+        @if (weatherIconUrl) {
+          <img class="weather-icon" [src]="weatherIconUrl" [alt]="currentCondition" />
+        } @else {
+          <span class="weather-sun" aria-hidden="true"></span>
+        }
+      </div>
+
+      <div class="weather-stats">
+        <div class="weather-stat">
+          <span>Min</span>
+          <strong>{{ minTemperature !== null ? minTemperature + '°' : '--' }}</strong>
+        </div>
+        <div class="weather-stat">
+          <span>Max</span>
+          <strong>{{ maxTemperature !== null ? maxTemperature + '°' : '--' }}</strong>
+        </div>
+        <div class="weather-stat">
+          <span>Humedad</span>
+          <strong>{{ humidity !== null ? humidity + '%' : '--' }}</strong>
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <p class="weather-error">{{ errorMessage }}</p>
+      }
+    </article>
+  </section>
+
+  <section class="details-main shell" aria-label="Detalle de clima">
+    <article class="detail-card detail-forecast24h glass-card feature-panel">
+      <div class="panel-head">
+        <h3>24-HOUR FORECAST</h3>
+        <span>Next hours</span>
+      </div>
+      <div class="forecast-strip">
+        @for (item of forecastPreview; track $index; let i = $index) {
+          <div class="forecast-item" [class.is-now]="i === 0">
+            <span class="forecast-hour">{{ i === 0 ? 'Now' : item.hour }}</span>
+            @if (item.iconUrl) {
+              <img [src]="item.iconUrl" alt="icono clima" class="forecast-icon" />
+            } @else {
+              <span class="forecast-fallback">-</span>
+            }
+            <strong>{{ item.temperature }}°</strong>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="detail-card glass-card uv-card feature-panel">
+      <div class="panel-head">
+        <h3>Indice UV</h3>
+        <span>{{ uvLevelLabel }}</span>
+      </div>
+      <p class="detail-value detail-value-hero">{{ uvIndex !== null ? uvIndex : '--' }}</p>
+      <p class="detail-subtitle">{{ uvLevelLabel }}</p>
+      <div class="uv-track">
+        <span class="uv-fill" [style.width.%]="uvProgress"></span>
+      </div>
+    </article>
+
+    <article class="detail-card glass-card feature-panel">
+      <div class="panel-head">
+        <h3>Humedad</h3>
+        <span>Feels</span>
+      </div>
+      <p class="detail-value detail-value-hero">{{ humidity !== null ? humidity + '%' : '--' }}</p>
+    </article>
+
+    <article class="detail-card glass-card feature-panel">
+      <div class="panel-head">
+        <h3>Viento</h3>
+        <span>{{ windDirection ?? '--' }}</span>
+      </div>
+      <div class="wind-row">
+        <div>
+          <p class="detail-value detail-value-hero">{{ windSpeed !== null ? windSpeed + ' km/h' : '--' }}</p>
+          <p class="detail-subtitle">Velocidad</p>
+        </div>
+        <span
+          class="wind-direction-icon"
+          [class.no-data]="windDirectionDegrees === null"
+          [style.transform]="'rotate(' + (windDirectionDegrees ?? 0) + 'deg)'"
+          [attr.aria-label]="windDirection ? 'Direccion del viento ' + windDirection : 'Direccion del viento no disponible'"
+        ></span>
+      </div>
+      <p class="detail-subtitle">Direccion: {{ windDirection ?? '--' }}</p>
+    </article>
+  </section>
+</main>
