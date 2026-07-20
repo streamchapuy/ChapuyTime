@@ -35,6 +35,12 @@
         </div>
 
         <div class="temperature-range-graph">
+          <div class="temperature-range-scale">
+            <span>{{ minTemperature !== null ? minTemperature + '°' : '--' }}</span>
+            <span>{{ currentTemperature !== null ? currentTemperature + '°' : '--' }}</span>
+            <span>{{ maxTemperature !== null ? maxTemperature + '°' : '--' }}</span>
+          </div>
+
           <div class="temperature-range-track">
             <span class="temperature-range-fill"></span>
             <span class="temperature-range-marker" [style.left.%]="temperatureRangeProgress"></span>
