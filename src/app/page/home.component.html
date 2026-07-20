@@ -28,18 +28,32 @@
         }
       </div>
 
-      <div class="weather-stats">
-        <div class="weather-stat">
-          <span>Min</span>
-          <strong>{{ minTemperature !== null ? minTemperature + '°' : '--' }}</strong>
+      <div class="temperature-range-card" aria-label="Rango de temperatura">
+        <div class="temperature-range-head">
+          <span>Rango térmico</span>
+          <strong>{{ currentTemperature !== null ? currentTemperature + '° ahora' : 'Sin dato' }}</strong>
         </div>
-        <div class="weather-stat">
-          <span>Max</span>
-          <strong>{{ maxTemperature !== null ? maxTemperature + '°' : '--' }}</strong>
-        </div>
-        <div class="weather-stat">
-          <span>Humedad</span>
-          <strong>{{ humidity !== null ? humidity + '%' : '--' }}</strong>
+
+        <div class="temperature-range-graph">
+          <div class="temperature-range-track">
+            <span class="temperature-range-fill"></span>
+            <span class="temperature-range-marker" [style.left.%]="temperatureRangeProgress"></span>
+          </div>
+
+          <div class="temperature-range-labels">
+            <div>
+              <span>Mín</span>
+              <strong>{{ minTemperature !== null ? minTemperature + '°' : '--' }}</strong>
+            </div>
+            <div class="temperature-range-center">
+              <span>Actual</span>
+              <strong>{{ currentTemperature !== null ? currentTemperature + '°' : '--' }}</strong>
+            </div>
+            <div>
+              <span>Máx</span>
+              <strong>{{ maxTemperature !== null ? maxTemperature + '°' : '--' }}</strong>
+            </div>
+          </div>
         </div>
       </div>
 

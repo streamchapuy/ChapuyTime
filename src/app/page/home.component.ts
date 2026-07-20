@@ -118,6 +118,20 @@ export class HomeComponent implements OnInit {
     return Math.max(0, Math.min(100, (this.uvIndex / 11) * 100));
   }
 
+  get temperatureRangeProgress(): number {
+    if (
+      this.currentTemperature === null
+      || this.minTemperature === null
+      || this.maxTemperature === null
+      || this.maxTemperature === this.minTemperature
+    ) {
+      return 0;
+    }
+
+    const normalized = ((this.currentTemperature - this.minTemperature) / (this.maxTemperature - this.minTemperature)) * 100;
+    return Math.max(0, Math.min(100, normalized));
+  }
+
   get weatherThemeClass(): string {
     const normalized = this.currentCondition.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
