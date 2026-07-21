@@ -1,0 +1,65 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00bcd4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0277bd;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cloudGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4dd0e1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00acc1;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" fill="#f5f5f5"/>
+
+  <!-- Sun -->
+  <circle cx="380" cy="100" r="45" fill="#ffd54f" filter="url(#shadow)"/>
+  <g stroke="#ffd54f" stroke-width="8" stroke-linecap="round" fill="none">
+    <line x1="380" y1="30" x2="380" y2="10"/>
+    <line x1="380" y1="190" x2="380" y2="170"/>
+    <line x1="450" y1="100" x2="470" y2="100"/>
+    <line x1="310" y1="100" x2="290" y2="100"/>
+    <line x1="435" y1="45" x2="450" y2="30"/>
+    <line x1="310" y1="155" x2="295" y2="170"/>
+    <line x1="435" y1="155" x2="450" y2="170"/>
+    <line x1="310" y1="45" x2="295" y2="30"/>
+  </g>
+
+  <!-- Cloud 1 (Left) -->
+  <path d="M 80 200 Q 50 200 50 230 Q 50 260 80 260 L 220 260 Q 240 260 240 240 Q 240 220 220 220 Q 220 180 180 180 Q 160 160 140 160 Q 110 160 100 190"
+        fill="url(#cloudGradient)" filter="url(#shadow)"/>
+
+  <!-- Cloud 2 (Right) -->
+  <path d="M 300 150 Q 270 150 270 180 Q 270 210 300 210 L 420 210 Q 440 210 440 190 Q 440 170 420 170 Q 420 130 380 130 Q 360 110 340 110 Q 310 110 300 140"
+        fill="url(#cloudGradient)" filter="url(#shadow)"/>
+
+  <!-- Rain drops -->
+  <g fill="#0277bd" opacity="0.8">
+    <!-- Drop 1 -->
+    <path d="M 120 270 Q 115 280 120 295 Q 130 285 125 270 Z"/>
+    <!-- Drop 2 -->
+    <path d="M 160 280 Q 155 290 160 305 Q 170 295 165 280 Z"/>
+    <!-- Drop 3 -->
+    <path d="M 200 270 Q 195 280 200 295 Q 210 285 205 270 Z"/>
+    <!-- Drop 4 -->
+    <path d="M 100 310 Q 95 320 100 335 Q 110 325 105 310 Z"/>
+    <!-- Drop 5 -->
+    <path d="M 180 320 Q 175 330 180 345 Q 190 335 185 320 Z"/>
+  </g>
+
+  <!-- N Letter (center) -->
+  <g fill="#ffffff" filter="url(#shadow)">
+    <!-- Left vertical line -->
+    <rect x="200" y="220" width="40" height="120" rx="8"/>
+    <!-- Right vertical line -->
+    <rect x="280" y="220" width="40" height="120" rx="8"/>
+    <!-- Diagonal line -->
+    <g transform="translate(256, 280)">
+      <rect width="45" height="40" fill="#ffffff" transform="rotate(-35)" rx="8"/>
+    </g>
+  </g>
+</svg>
