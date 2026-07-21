@@ -102,6 +102,10 @@
         </div>
       </div>
 
+      <div class="temperature-graph-container">
+        <canvas #temperatureChart class="temperature-chart"></canvas>
+      </div>
+
       <div class="forecast-list">
         @for (item of forecast24h; track item.hour; let i = $index) {
           <div class="forecast-row" [class.is-now]="i === 0">

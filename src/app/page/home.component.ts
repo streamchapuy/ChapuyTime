@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, HostListener, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, AfterViewInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { finalize } from 'rxjs/operators';
+import Chart from 'chart.js/auto';
 
 import { HeaderComponent } from '../Component/header.component';
 import { HourlyForecast, WeatherService } from '../services/weather.service';
@@ -20,9 +21,12 @@ interface BeforeInstallPromptEvent extends Event {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
+  @ViewChild('temperatureChart') temperatureChartCanvas!: ElementRef<HTMLCanvasElement>;
+
   private readonly weatherService = inject(WeatherService);
   private deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
+  private temperatureChart: Chart | null = null;
 
   title = 'Nimbus';
   currentLocation = 'Obteniendo ubicacion precisa...';
@@ -282,6 +286,113 @@ export class HomeComponent implements OnInit {
         maximumAge: 0
       }
     );
+  }
+
+  ngAfterViewInit(): void {
+    if (this.forecast24h.length > 0) {
+      this.initializeTemperatureChart();
+    }
+  }
+
+  private initializeTemperatureChart(): void {
+    if (!this.temperatureChartCanvas?.nativeElement || !this.forecast24h.length) {
+      return;
+    }
+
+    const ctx = this.temperatureChartCanvas.nativeElement.getContext('2d');
+    if (!ctx) {
+      return;
+    }
+
+    // Destruir gráfico anterior si existe
+    if (this.temperatureChart) {
+      this.temperatureChart.destroy();
+    }
+
+    const labels = this.forecast24h.map((item) => {
+      if (item.hour === 'Ahora') {
+        return 'Ahora';
+      }
+      return item.hour || '--';
+    });
+
+    const temperatures = this.forecast24h.map((item) => item.temperature);
+
+    this.temperatureChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Temperatura (°C)',
+            data: temperatures,
+            borderColor: '#4ade80',
+            backgroundColor: 'rgba(74, 222, 128, 0.08)',
+            borderWidth: 3,
+            fill: true,
+            pointRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#4ade80',
+            pointBorderWidth: 2,
+            pointHoverRadius: 8,
+            tension: 0.4,
+            segment: {
+              borderColor: (ctx) => (ctx.p1DataIndex === 0 ? '#ffffff' : '#4ade80'),
+              borderWidth: (ctx) => (ctx.p1DataIndex === 0 ? 4 : 3)
+            }
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#4ade80',
+            borderWidth: 1,
+            displayColors: false,
+            callbacks: {
+              label: (context) => `${context.parsed.y}°C`
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            min: Math.min(...temperatures) - 2,
+            max: Math.max(...temperatures) + 2,
+            grid: {
+              color: 'rgba(255, 255, 255, 0.08)',
+              display: true
+            },
+            ticks: {
+              color: 'rgba(255, 255, 255, 0.6)',
+              font: {
+                size: 11
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: 'rgba(255, 255, 255, 0.6)',
+              font: {
+                size: 11
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   async installApp(): Promise<void> {
