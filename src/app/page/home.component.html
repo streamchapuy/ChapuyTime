@@ -106,6 +106,19 @@
         <canvas #temperatureChart class="temperature-chart"></canvas>
       </div>
 
+      <div class="weather-icons-row">
+        @for (item of forecast24h; track item.hour; let i = $index) {
+          <div class="weather-icon-item">
+            @if (item.iconUrl) {
+              <img [src]="item.iconUrl" alt="icono clima" class="weather-icon" />
+            } @else {
+              <span class="weather-icon-fallback">-</span>
+            }
+            <span class="weather-icon-time">{{ i === 0 ? 'Ahora' : item.hour }}</span>
+          </div>
+        }
+      </div>
+
       <div class="forecast-list">
         @for (item of forecast24h; track item.hour; let i = $index) {
           <div class="forecast-row" [class.is-now]="i === 0">

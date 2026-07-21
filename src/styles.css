@@ -710,8 +710,8 @@ app-home .forecast-summary-chip strong {
 app-home .temperature-graph-container {
 	position: relative;
 	width: 100%;
-	margin: 16px 0;
-	padding: 12px;
+	margin: 16px 0 12px 0;
+	padding: 10px;
 	background: rgba(255, 255, 255, 0.04);
 	border-radius: 16px;
 	border: 1px solid rgba(255, 255, 255, 0.08);
@@ -720,7 +720,63 @@ app-home .temperature-graph-container {
 app-home .temperature-chart {
 	display: block;
 	width: 100% !important;
-	height: 280px !important;
+	height: 140px !important;
+}
+
+app-home .weather-icons-row {
+	display: flex;
+	gap: 8px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	padding: 0 0 8px 0;
+	-webkit-overflow-scrolling: touch;
+	margin-bottom: 12px;
+}
+
+app-home .weather-icons-row::-webkit-scrollbar {
+	height: 2px;
+}
+
+app-home .weather-icons-row::-webkit-scrollbar-track {
+	background: rgba(255, 255, 255, 0.08);
+	border-radius: 999px;
+}
+
+app-home .weather-icons-row::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.24);
+	border-radius: 999px;
+}
+
+app-home .weather-icon-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+	scroll-snap-align: start;
+}
+
+app-home .weather-icon {
+	width: 28px;
+	height: 28px;
+	padding: 2px;
+}
+
+app-home .weather-icon-fallback {
+	width: 28px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.75rem;
+	opacity: 0.5;
+}
+
+app-home .weather-icon-time {
+	font-size: 0.65rem;
+	color: rgba(240, 247, 255, 0.72);
+	white-space: nowrap;
 }
 
 app-home .forecast-list {
