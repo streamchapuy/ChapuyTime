@@ -530,6 +530,45 @@ app-home .temperature-range-center::before {
 	z-index: -1;
 }
 
+app-home .weather-quick-stats {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+	margin-top: 14px;
+}
+
+app-home .weather-quick-stat {
+	padding: 12px 14px;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(10px);
+	text-align: left;
+}
+
+app-home .weather-quick-stat span {
+	display: block;
+	font-size: 0.62rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	opacity: 0.72;
+}
+
+app-home .weather-quick-stat strong {
+	display: block;
+	margin-top: 6px;
+	font-family: 'Space Grotesk', sans-serif;
+	font-size: 1.1rem;
+	font-weight: 700;
+}
+
+app-home .weather-quick-stat small {
+	display: block;
+	margin-top: 4px;
+	font-size: 0.72rem;
+	opacity: 0.8;
+}
+
 app-home .details-main {
 	width: 100%;
 	margin: 0;
@@ -820,7 +859,67 @@ app-home .install-button:disabled {
 	cursor: default;
 	box-shadow: none;
 }
+@media (max-width: 720px) {
+	app-home .forecast-list {
+		display: flex;
+		gap: 12px;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scroll-snap-type: x mandatory;
+		scroll-behavior: smooth;
+		padding-bottom: 4px;
+		-webkit-overflow-scrolling: touch;
+	}
 
+	app-home .forecast-list::-webkit-scrollbar {
+		height: 3px;
+	}
+
+	app-home .forecast-list::-webkit-scrollbar-track {
+		background: rgba(255, 255, 255, 0.08);
+		border-radius: 999px;
+	}
+
+	app-home .forecast-list::-webkit-scrollbar-thumb {
+		background: rgba(255, 255, 255, 0.24);
+		border-radius: 999px;
+	}
+
+	app-home .forecast-row {
+		display: flex;
+		flex-direction: column;
+		flex-shrink: 0;
+		width: 140px;
+		scroll-snap-align: start;
+		grid-template-columns: unset;
+		padding: 12px;
+		gap: 8px;
+		align-items: center;
+		text-align: center;
+	}
+
+	app-home .forecast-time-block {
+		width: 100%;
+		text-align: center;
+	}
+
+	app-home .forecast-icon-block {
+		flex-direction: column;
+		width: 100%;
+		justify-content: center;
+	}
+
+	app-home .forecast-meta-block {
+		width: 100%;
+		font-size: 0.65rem;
+		text-align: center;
+	}
+
+	app-home .forecast-meta-block span {
+		display: block;
+		margin-top: 2px;
+	}
+}
 @media (min-width: 721px) {
 	app-home .forecast-row {
 		grid-template-columns: minmax(140px, 1fr) auto minmax(170px, 1fr);
