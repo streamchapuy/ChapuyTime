@@ -63,6 +63,18 @@
         </div>
       </div>
 
+      <div class="weather-quick-stats" aria-label="Humedad y viento">
+        <div class="weather-quick-stat">
+          <span>Humedad</span>
+          <strong>{{ humidity !== null ? humidity + '%' : '--' }}</strong>
+        </div>
+        <div class="weather-quick-stat">
+          <span>Viento</span>
+          <strong>{{ windSpeed !== null ? windSpeed + ' km/h' : '--' }}</strong>
+          <small>{{ windDirection ?? 'Sin dirección' }}</small>
+        </div>
+      </div>
+
       @if (errorMessage) {
         <p class="weather-error">{{ errorMessage }}</p>
       }
@@ -110,7 +122,7 @@
             <div class="forecast-meta-block">
               <span>Humedad {{ item.humidity !== null ? item.humidity + '%' : '--' }}</span>
               <span>Viento {{ item.windSpeed !== null ? item.windSpeed + ' km/h' : '--' }}</span>
-              <span>Lluvia {{ item.rainProbability !== null ? item.rainProbability + '%' : '--' }}</span>
+              <span>Lluvia {{ item.rainProbability !== null ? item.rainProbability + '%' : '--' }} · {{ item.rainMillimeters !== null ? item.rainMillimeters + ' mm' : '--' }}</span>
             </div>
           </div>
         }

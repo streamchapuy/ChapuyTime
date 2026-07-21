@@ -22,6 +22,7 @@ interface OpenMeteoForecastResponse {
     weather_code?: number[];
     wind_speed_10m?: number[];
     precipitation_probability?: number[];
+    precipitation?: number[];
     is_day?: number[];
   };
   daily?: {
@@ -61,6 +62,7 @@ export interface HourlyForecast {
   humidity: number | null;
   windSpeed: number | null;
   rainProbability: number | null;
+  rainMillimeters: number | null;
 }
 
 export interface WeatherSnapshot {
@@ -118,7 +120,7 @@ export class WeatherService {
       .set('longitude', lon)
       .set('timezone', 'auto')
       .set('current', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day')
-      .set('hourly', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation_probability,is_day')
+      .set('hourly', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation_probability,precipitation,is_day')
       .set('daily', 'temperature_2m_max,temperature_2m_min')
       .set('forecast_days', '2');
 
@@ -183,7 +185,8 @@ export class WeatherService {
         condition: weatherDescriptor.label,
         humidity: forecast.hourly?.relative_humidity_2m?.[absoluteIndex] ?? null,
         windSpeed: this.toRoundedValue(forecast.hourly?.wind_speed_10m?.[absoluteIndex]),
-        rainProbability: forecast.hourly?.precipitation_probability?.[absoluteIndex] ?? null
+        rainProbability: forecast.hourly?.precipitation_probability?.[absoluteIndex] ?? null,
+        rainMillimeters: this.toNullableDecimal(forecast.hourly?.precipitation?.[absoluteIndex])
       };
     });
   }
