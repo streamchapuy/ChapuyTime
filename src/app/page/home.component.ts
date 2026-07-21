@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, HostListener, OnInit, AfterViewInit, ViewChild, ElementRef, inject } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import Chart from 'chart.js/auto';
 
@@ -21,7 +21,7 @@ interface BeforeInstallPromptEvent extends Event {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit {
   @ViewChild('temperatureChart') temperatureChartCanvas!: ElementRef<HTMLCanvasElement>;
 
   private readonly weatherService = inject(WeatherService);
@@ -254,6 +254,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
               this.uvIndex = weather.uvIndex;
               this.forecast24h = weather.hourly24h;
               this.errorMessage = '';
+              // Inicializar gráfico después de que los datos estén disponibles
+              requestAnimationFrame(() => this.initializeTemperatureChart());
             },
             error: (error: HttpErrorResponse) => {
               this.errorMessage = this.resolveErrorMessage(error);
@@ -286,12 +288,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
         maximumAge: 0
       }
     );
-  }
-
-  ngAfterViewInit(): void {
-    if (this.forecast24h.length > 0) {
-      this.initializeTemperatureChart();
-    }
   }
 
   private initializeTemperatureChart(): void {
