@@ -84,58 +84,63 @@
   <section class="details-main shell" aria-label="Detalle de clima">
     <article class="detail-card detail-forecast24h glass-card feature-panel">
       <div class="panel-head">
-        <h3>24-HOUR FORECAST</h3>
+        <h3>Clima en 24 horas</h3>
         <span>{{ next24hDominantCondition }}</span>
       </div>
       <div class="forecast-summary-row">
         <div class="forecast-summary-chip">
-          <span>Min</span>
+          <span>Min 24h</span>
           <strong>{{ next24hMinTemperature !== null ? next24hMinTemperature + '°' : '--' }}</strong>
         </div>
         <div class="forecast-summary-chip">
-          <span>Max</span>
+          <span>Max 24h</span>
           <strong>{{ next24hMaxTemperature !== null ? next24hMaxTemperature + '°' : '--' }}</strong>
         </div>
         <div class="forecast-summary-chip">
-          <span>Tramo</span>
+          <span>Ventana</span>
           <strong>cada 3h</strong>
         </div>
       </div>
 
-      <div class="weather-icons-row">
+      <div class="weather-icons-row" aria-label="Linea de tiempo 24h">
         @for (item of forecast24h; track item.hour; let i = $index) {
-          <div class="weather-icon-item">
-            @if (item.iconUrl) {
-              <img [src]="item.iconUrl" alt="icono clima" class="weather-icon" />
-            } @else {
-              <span class="weather-icon-fallback">-</span>
-            }
+          <div class="weather-icon-item" [class.is-now]="i === 0">
+            <div class="weather-icon-badge">
+              @if (item.iconUrl) {
+                <img [src]="item.iconUrl" alt="icono clima" class="weather-timeline-icon" />
+              } @else {
+                <span class="weather-icon-fallback">-</span>
+              }
+            </div>
             <span class="weather-icon-time">{{ i === 0 ? 'Ahora' : item.hour }}</span>
+            <small class="weather-icon-temp">{{ item.temperature }}°</small>
           </div>
         }
       </div>
 
-      <div class="forecast-list">
+      <div class="forecast-list" aria-label="Pronostico detallado por hora">
         @for (item of forecast24h; track item.hour; let i = $index) {
           <div class="forecast-row" [class.is-now]="i === 0">
-            <div class="forecast-time-block">
-              <span class="forecast-hour">{{ i === 0 ? 'Ahora' : item.hour }}</span>
-              <small>{{ item.condition }}</small>
-            </div>
+            <div class="forecast-top-row">
+              <div class="forecast-time-block">
+                <span class="forecast-hour">{{ i === 0 ? 'Ahora' : item.hour }}</span>
+                <small>{{ item.condition }}</small>
+              </div>
 
-            <div class="forecast-icon-block">
-              @if (item.iconUrl) {
-                <img [src]="item.iconUrl" alt="icono clima" class="forecast-icon" />
-              } @else {
-                <span class="forecast-fallback">-</span>
-              }
-              <strong>{{ item.temperature }}°</strong>
+              <div class="forecast-icon-block">
+                @if (item.iconUrl) {
+                  <img [src]="item.iconUrl" alt="icono clima" class="forecast-icon" />
+                } @else {
+                  <span class="forecast-fallback">-</span>
+                }
+                <strong>{{ item.temperature }}°</strong>
+              </div>
             </div>
 
             <div class="forecast-meta-block">
-              <span>Humedad {{ item.humidity !== null ? item.humidity + '%' : '--' }}</span>
-              <span>Viento {{ item.windSpeed !== null ? item.windSpeed + ' km/h' : '--' }}</span>
-              <span>Lluvia {{ item.rainProbability !== null ? item.rainProbability + '%' : '--' }} · {{ item.rainMillimeters !== null ? item.rainMillimeters + ' mm' : '--' }}</span>
+              <span class="meta-pill">Hum {{ item.humidity !== null ? item.humidity + '%' : '--' }}</span>
+              <span class="meta-pill">Vto {{ item.windSpeed !== null ? item.windSpeed + ' km/h' : '--' }}</span>
+              <span class="meta-pill">Lluvia {{ item.rainProbability !== null ? item.rainProbability + '%' : '--' }} · {{ item.rainMillimeters !== null ? item.rainMillimeters + ' mm' : '--' }}</span>
             </div>
           </div>
         }
