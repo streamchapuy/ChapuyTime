@@ -97,52 +97,52 @@
           <strong>{{ next24hMaxTemperature !== null ? next24hMaxTemperature + '°' : '--' }}</strong>
         </div>
         <div class="forecast-summary-chip">
-          <span>Ventana</span>
-          <strong>cada 3h</strong>
+          <span>Tendencia</span>
+          <strong>{{ next24hDominantCondition }}</strong>
         </div>
       </div>
 
-      <div class="weather-icons-row" aria-label="Linea de tiempo 24h">
-        @for (item of forecast24h; track item.hour; let i = $index) {
-          <div class="weather-icon-item" [class.is-now]="i === 0">
-            <div class="weather-icon-badge">
-              @if (item.iconUrl) {
-                <img [src]="item.iconUrl" alt="icono clima" class="weather-timeline-icon" />
-              } @else {
-                <span class="weather-icon-fallback">-</span>
-              }
-            </div>
-            <span class="weather-icon-time">{{ i === 0 ? 'Ahora' : item.hour }}</span>
-            <small class="weather-icon-temp">{{ item.temperature }}°</small>
-          </div>
+      <div class="forecast-filter-row" role="tablist" aria-label="Filtro por tramo horario">
+        @for (filter of timeFilters; track filter.key) {
+          <button
+            class="forecast-filter"
+            type="button"
+            [class.is-active]="selectedTimeFilter === filter.key"
+            (click)="setTimeFilter(filter.key)"
+          >
+            {{ filter.label }}
+          </button>
         }
       </div>
 
-      <div class="forecast-list" aria-label="Pronostico detallado por hora">
-        @for (item of forecast24h; track item.hour; let i = $index) {
-          <div class="forecast-row" [class.is-now]="i === 0">
-            <div class="forecast-top-row">
-              <div class="forecast-time-block">
-                <span class="forecast-hour">{{ i === 0 ? 'Ahora' : item.hour }}</span>
-                <small>{{ item.condition }}</small>
+      <div class="forecast-strip" aria-label="Pronostico por hora en 24hs">
+        @for (item of filteredForecast24h; track item.hour; let i = $index) {
+          <article class="forecast-tile" [class.is-now]="i === 0">
+            <div class="forecast-tile-main">
+              <div>
+                <span class="forecast-tile-time">{{ i === 0 ? 'Ahora' : item.hour }}</span>
+                <small class="forecast-tile-condition">{{ item.condition }}</small>
               </div>
 
-              <div class="forecast-icon-block">
+              <div class="forecast-tile-icon">
                 @if (item.iconUrl) {
                   <img [src]="item.iconUrl" alt="icono clima" class="forecast-icon" />
                 } @else {
                   <span class="forecast-fallback">-</span>
                 }
-                <strong>{{ item.temperature }}°</strong>
+                <strong class="forecast-tile-temp">{{ item.temperature }}°</strong>
               </div>
             </div>
 
-            <div class="forecast-meta-block">
-              <span class="meta-pill">Hum {{ item.humidity !== null ? item.humidity + '%' : '--' }}</span>
-              <span class="meta-pill">Vto {{ item.windSpeed !== null ? item.windSpeed + ' km/h' : '--' }}</span>
-              <span class="meta-pill">Lluvia {{ item.rainProbability !== null ? item.rainProbability + '%' : '--' }} · {{ item.rainMillimeters !== null ? item.rainMillimeters + ' mm' : '--' }}</span>
+            <div class="forecast-kpis">
+              <span class="forecast-kpi">Hum {{ item.humidity !== null ? item.humidity + '%' : '--' }}</span>
+              <span class="forecast-kpi">Vto {{ item.windSpeed !== null ? item.windSpeed + ' km/h' : '--' }}</span>
+              <span class="forecast-kpi forecast-kpi-rain">Lluvia {{ item.rainProbability !== null ? item.rainProbability + '%' : '--' }} · {{ item.rainMillimeters !== null ? item.rainMillimeters + ' mm' : '--' }}</span>
+              <span class="rain-risk-pill" [class]="'rain-risk-pill ' + getRainRiskClass(item.rainProbability)">
+                {{ getRainRiskLabel(item.rainProbability) }}
+              </span>
             </div>
-          </div>
+          </article>
         }
       </div>
     </article>

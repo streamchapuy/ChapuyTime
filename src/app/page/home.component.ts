@@ -13,6 +13,8 @@ interface BeforeInstallPromptEvent extends Event {
   }>;
 }
 
+type TimeFilterKey = 'all' | 'morning' | 'afternoon' | 'night';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -36,13 +38,48 @@ export class HomeComponent implements OnInit {
   windDirectionDegrees: number | null = null;
   uvIndex: number | null = null;
   forecast24h: HourlyForecast[] = [];
+  selectedTimeFilter: TimeFilterKey = 'all';
   errorMessage = '';
   isLoading = true;
   canInstallApp = false;
   isInstallPromptVisible = false;
 
+  readonly timeFilters: Array<{ key: TimeFilterKey; label: string }> = [
+    { key: 'all', label: 'Ahora' },
+    { key: 'morning', label: 'Manana' },
+    { key: 'afternoon', label: 'Tarde' },
+    { key: 'night', label: 'Noche' }
+  ];
+
   get forecastPreview(): HourlyForecast[] {
     return this.forecast24h.slice(0, 4);
+  }
+
+  get filteredForecast24h(): HourlyForecast[] {
+    if (this.selectedTimeFilter === 'all') {
+      return this.forecast24h;
+    }
+
+    const filtered = this.forecast24h.filter((item) => {
+      const hour = this.extractHourValue(item.hour);
+
+      if (hour === null) {
+        return false;
+      }
+
+      if (this.selectedTimeFilter === 'morning') {
+        return hour >= 6 && hour < 12;
+      }
+
+      if (this.selectedTimeFilter === 'afternoon') {
+        return hour >= 12 && hour < 18;
+      }
+
+      return hour >= 18 || hour < 6;
+    });
+
+    // Fallback: si no hay datos en ese tramo, se evita dejar la UI vacia.
+    return filtered.length > 0 ? filtered : this.forecast24h;
   }
 
   get next24hMinTemperature(): number | null {
@@ -193,6 +230,38 @@ export class HomeComponent implements OnInit {
     return 'Sin datos';
   }
 
+  setTimeFilter(filter: TimeFilterKey): void {
+    this.selectedTimeFilter = filter;
+  }
+
+  getRainRiskLabel(probability: number | null): string {
+    if (probability === null) {
+      return 'Riesgo bajo';
+    }
+
+    if (probability >= 60) {
+      return 'Riesgo alto';
+    }
+
+    if (probability >= 30) {
+      return 'Riesgo medio';
+    }
+
+    return 'Riesgo bajo';
+  }
+
+  getRainRiskClass(probability: number | null): string {
+    if (probability === null || probability < 30) {
+      return 'rain-risk-low';
+    }
+
+    if (probability < 60) {
+      return 'rain-risk-medium';
+    }
+
+    return 'rain-risk-high';
+  }
+
   @HostListener('window:beforeinstallprompt', ['$event'])
   onBeforeInstallPrompt(event: Event): void {
     event.preventDefault();
@@ -316,5 +385,16 @@ export class HomeComponent implements OnInit {
     }
 
     return 'No se pudo consultar Open-Meteo.';
+  }
+
+  private extractHourValue(hourLabel: string): number | null {
+    const match = hourLabel.match(/^(\d{1,2})/);
+
+    if (!match) {
+      return null;
+    }
+
+    const parsed = Number(match[1]);
+    return Number.isNaN(parsed) ? null : parsed;
   }
 }
