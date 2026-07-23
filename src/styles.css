@@ -599,6 +599,7 @@ app-home .panel-head {
 	align-items: baseline;
 	justify-content: space-between;
 	gap: 12px;
+	flex-wrap: wrap;
 }
 
 app-home .panel-head span {
@@ -726,7 +727,7 @@ app-home .temperature-chart-card {
 	margin-top: 10px;
 	padding: 10px 8px 8px;
 	border-radius: 14px;
-	background: rgba(7, 30, 53, 0.26);
+	background: rgba(7, 30, 53, 0.34);
 	border: 1px solid rgba(255, 255, 255, 0.16);
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
@@ -962,6 +963,8 @@ app-home .forecast-detail-item strong {
 	font-weight: 700;
 	color: #ffffff;
 	line-height: 1.25;
+	white-space: normal;
+	word-break: break-word;
 }
 
 app-home .forecast-detail-risk strong {
@@ -1352,12 +1355,12 @@ app-home .install-button:disabled {
 	}
 
 	app-home .panel-head h3 {
-		font-size: 0.72rem;
-		letter-spacing: 0.15em;
+		font-size: 0.74rem;
+		letter-spacing: 0.12em;
 	}
 
 	app-home .panel-head span {
-		font-size: 0.64rem;
+		font-size: 0.66rem;
 	}
 
 	app-home .forecast-summary-row {
@@ -1379,11 +1382,11 @@ app-home .install-button:disabled {
 	}
 
 	app-home .forecast-summary-chip span {
-		font-size: 0.56rem;
+		font-size: 0.6rem;
 	}
 
 	app-home .forecast-summary-chip strong {
-		font-size: 0.84rem;
+		font-size: 0.92rem;
 	}
 
 	app-home .temperature-chart-card {
@@ -1392,7 +1395,7 @@ app-home .install-button:disabled {
 
 	app-home .temperature-chart,
 	app-home .chart-hit-layer {
-		height: 112px;
+		height: 120px;
 	}
 
 	app-home .chart-hit {
@@ -1410,7 +1413,7 @@ app-home .install-button:disabled {
 	}
 
 	app-home .hour-chip-time {
-		font-size: 0.62rem;
+		font-size: 0.64rem;
 	}
 
 	app-home .hour-chip-icon {
@@ -1419,7 +1422,7 @@ app-home .install-button:disabled {
 	}
 
 	app-home .hour-chip-temp {
-		font-size: 1rem;
+		font-size: 1.04rem;
 	}
 
 	app-home .forecast-detail-grid {
@@ -1432,11 +1435,15 @@ app-home .install-button:disabled {
 	}
 
 	app-home .forecast-detail-item span {
-		font-size: 0.58rem;
+		font-size: 0.6rem;
 	}
 
 	app-home .forecast-detail-item strong {
-		font-size: 0.78rem;
+		font-size: 0.82rem;
+	}
+
+	app-home .forecast-detail-risk strong {
+		font-size: 0.68rem;
 	}
 }
 @media (min-width: 721px) {
@@ -1487,6 +1494,22 @@ app-home .install-button:disabled {
 
 	app-home .hour-chip {
 		flex-basis: 74px;
+	}
+
+	app-home .detail-forecast24h {
+		padding: 10px;
+	}
+
+	app-home .forecast-summary-chip {
+		flex-basis: 102px;
+	}
+
+	app-home .forecast-detail-grid {
+		grid-template-columns: 1fr;
+	}
+
+	app-home .forecast-detail-item strong {
+		font-size: 0.86rem;
 	}
 
 	app-home .forecast-detail-temp {
