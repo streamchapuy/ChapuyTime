@@ -715,6 +715,11 @@ app-home .forecast-summary-chip strong {
 	text-overflow: ellipsis;
 }
 
+app-home .forecast-summary-chip:last-child strong {
+	white-space: normal;
+	line-height: 1.15;
+}
+
 app-home .temperature-chart-card {
 	position: relative;
 	margin-top: 10px;
@@ -1334,90 +1339,99 @@ app-home .install-button:disabled {
 	box-shadow: none;
 }
 @media (max-width: 720px) {
-	app-home .forecast-filter {
-		min-height: 30px;
-		padding: 0 10px;
+	app-home .details-main {
+		padding: 12px 8px 18px;
+		gap: 10px;
+	}
+
+	app-home .detail-card,
+	app-home .detail-forecast24h {
+		padding: 11px;
+		border-radius: 18px;
+	}
+
+	app-home .panel-head h3 {
+		font-size: 0.72rem;
+		letter-spacing: 0.15em;
+	}
+
+	app-home .panel-head span {
+		font-size: 0.64rem;
+	}
+
+	app-home .forecast-summary-row {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 7px;
+	}
+
+	app-home .forecast-summary-chip:last-child {
+		grid-column: 1 / -1;
+	}
+
+	app-home .forecast-summary-chip span {
+		font-size: 0.58rem;
+	}
+
+	app-home .forecast-summary-chip strong {
+		font-size: 0.92rem;
+	}
+
+	app-home .temperature-chart-card {
+		padding: 10px 8px;
+	}
+
+	app-home .temperature-chart,
+	app-home .chart-hit-layer {
+		height: 102px;
+	}
+
+	app-home .chart-hit {
+		width: 22px;
+	}
+
+	app-home .hourly-carousel {
+		gap: 7px;
+		padding-top: 9px;
+	}
+
+	app-home .hour-chip {
+		flex-basis: 78px;
+		padding: 9px 6px;
+	}
+
+	app-home .hour-chip-time {
 		font-size: 0.62rem;
 	}
 
-	app-home .forecast-strip {
-		gap: 8px;
-		padding-top: 10px;
+	app-home .hour-chip-icon {
+		width: 26px;
+		height: 26px;
 	}
 
-	app-home .forecast-tile {
-		flex-basis: 166px;
-		padding: 10px;
+	app-home .hour-chip-temp {
+		font-size: 1rem;
 	}
 
-	app-home .forecast-kpi {
-		font-size: 0.54rem;
+	app-home .forecast-detail-grid {
+		grid-template-columns: 1fr;
+		gap: 6px;
 	}
 
-	app-home .forecast-list {
-		display: flex;
-		gap: 10px;
-		overflow-x: auto;
-		overflow-y: hidden;
-		scroll-snap-type: x mandatory;
-		scroll-behavior: smooth;
-		padding-bottom: 4px;
-		-webkit-overflow-scrolling: touch;
+	app-home .forecast-detail-item {
+		padding: 8px;
 	}
 
-	app-home .forecast-list::-webkit-scrollbar {
-		height: 3px;
+	app-home .forecast-detail-item span {
+		font-size: 0.58rem;
 	}
 
-	app-home .forecast-list::-webkit-scrollbar-track {
-		background: rgba(255, 255, 255, 0.08);
-		border-radius: 999px;
-	}
-
-	app-home .forecast-list::-webkit-scrollbar-thumb {
-		background: rgba(255, 255, 255, 0.24);
-		border-radius: 999px;
-	}
-
-	app-home .forecast-row {
-		display: flex;
-		flex-direction: column;
-		flex-shrink: 0;
-		width: 152px;
-		scroll-snap-align: start;
-		grid-template-columns: unset;
-		padding: 9px;
-		gap: 8px;
-		align-items: stretch;
-		text-align: left;
-	}
-
-	app-home .forecast-time-block {
-		width: auto;
-		text-align: left;
-	}
-
-	app-home .forecast-icon-block {
-		justify-content: flex-end;
-	}
-
-	app-home .forecast-meta-block {
-		width: 100%;
-		text-align: left;
-	}
-
-	app-home .meta-pill {
-		display: block;
-		margin-top: 0;
+	app-home .forecast-detail-item strong {
+		font-size: 0.82rem;
 	}
 }
 @media (min-width: 721px) {
-	app-home .forecast-tile {
-		flex-basis: 186px;
-	}
-
-	app-home .forecast-row {
-		width: 164px;
+	app-home .forecast-detail-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
 	app-home .install-cta {
@@ -1433,7 +1447,42 @@ app-home .install-button:disabled {
 	app-home .install-button {
 		min-width: 220px;
 	}
+}
+
+@media (max-width: 420px) {
+	app-home .shell {
+		width: min(1120px, calc(100% - 20px));
 	}
+
+	app-home .weather-card {
+		padding: 18px 14px 18px;
+	}
+
+	app-home .weather-city {
+		font-size: clamp(1.45rem, 7.2vw, 1.85rem);
+	}
+
+	app-home .weather-temp {
+		font-size: clamp(3rem, 14vw, 4.2rem);
+	}
+
+	app-home .temperature-range-card {
+		padding: 11px;
+	}
+
+	app-home .temperature-range-marker {
+		width: 20px;
+		height: 20px;
+	}
+
+	app-home .hour-chip {
+		flex-basis: 74px;
+	}
+
+	app-home .forecast-detail-temp {
+		font-size: 1.35rem;
+	}
+}
 
 app-home .detail-card h3 {
 	margin: 0;
