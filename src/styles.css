@@ -691,8 +691,8 @@ app-home .forecast-summary-row {
 app-home .forecast-summary-chip {
 	padding: 9px 8px;
 	border-radius: 12px;
-	background: rgba(8, 34, 58, 0.24);
-	border: 1px solid rgba(255, 255, 255, 0.14);
+	background: rgba(5, 24, 43, 0.34);
+	border: 1px solid rgba(205, 233, 255, 0.22);
 	text-align: center;
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
@@ -702,7 +702,7 @@ app-home .forecast-summary-chip span {
 	font-size: 0.56rem;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
-	opacity: 0.72;
+	color: rgba(227, 241, 255, 0.9);
 }
 
 app-home .forecast-summary-chip strong {
@@ -710,6 +710,7 @@ app-home .forecast-summary-chip strong {
 	margin-top: 4px;
 	font-size: 0.88rem;
 	font-family: 'Space Grotesk', sans-serif;
+	color: #ffffff;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -732,7 +733,7 @@ app-home .temperature-chart-card {
 
 app-home .temperature-chart {
 	width: 100%;
-	height: 90px;
+	height: 98px;
 	display: block;
 	overflow: visible;
 }
@@ -751,7 +752,7 @@ app-home .chart-area {
 app-home .chart-line {
 	fill: none;
 	stroke: rgba(154, 221, 255, 0.95);
-	stroke-width: 2.3;
+	stroke-width: 2.6;
 	stroke-linecap: round;
 	stroke-linejoin: round;
 	filter: drop-shadow(0 0 6px rgba(125, 210, 255, 0.35));
@@ -1360,20 +1361,29 @@ app-home .install-button:disabled {
 	}
 
 	app-home .forecast-summary-row {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 7px;
+		display: flex;
+		gap: 6px;
+		overflow-x: auto;
+		padding-bottom: 2px;
+		scrollbar-width: none;
 	}
 
-	app-home .forecast-summary-chip:last-child {
-		grid-column: 1 / -1;
+	app-home .forecast-summary-row::-webkit-scrollbar {
+		display: none;
+	}
+
+	app-home .forecast-summary-chip {
+		flex: 0 0 108px;
+		gap: 7px;
+		padding: 8px 7px;
 	}
 
 	app-home .forecast-summary-chip span {
-		font-size: 0.58rem;
+		font-size: 0.56rem;
 	}
 
 	app-home .forecast-summary-chip strong {
-		font-size: 0.92rem;
+		font-size: 0.84rem;
 	}
 
 	app-home .temperature-chart-card {
@@ -1382,7 +1392,7 @@ app-home .install-button:disabled {
 
 	app-home .temperature-chart,
 	app-home .chart-hit-layer {
-		height: 102px;
+		height: 112px;
 	}
 
 	app-home .chart-hit {
@@ -1413,7 +1423,7 @@ app-home .install-button:disabled {
 	}
 
 	app-home .forecast-detail-grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 6px;
 	}
 
@@ -1426,7 +1436,7 @@ app-home .install-button:disabled {
 	}
 
 	app-home .forecast-detail-item strong {
-		font-size: 0.82rem;
+		font-size: 0.78rem;
 	}
 }
 @media (min-width: 721px) {

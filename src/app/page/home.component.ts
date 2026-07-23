@@ -127,7 +127,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.forecast24h.map((item, index) => {
       const x = this.forecast24h.length === 1 ? 50 : (index / (this.forecast24h.length - 1)) * 100;
       const normalized = (item.temperature - minTemp) / spread;
-      const y = 88 - (normalized * 64);
+      const y = 82 - (normalized * 52);
 
       return {
         index,
