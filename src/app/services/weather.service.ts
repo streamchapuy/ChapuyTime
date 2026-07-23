@@ -171,7 +171,7 @@ export class WeatherService {
     const times = forecast.hourly?.time ?? [];
     const startIndex = currentTime ? Math.max(0, times.findIndex((time) => time >= currentTime)) : 0;
 
-    return times.slice(startIndex, startIndex + 8).map((time, index) => {
+    return times.slice(startIndex, startIndex + 24).map((time, index) => {
       const absoluteIndex = startIndex + index;
       const weatherDescriptor = this.getWeatherDescriptor(
         forecast.hourly?.weather_code?.[absoluteIndex],

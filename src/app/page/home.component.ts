@@ -1,5 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, HostListener, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+  inject
+} from '@angular/core';
 import { finalize } from 'rxjs/operators';
 
 import { HeaderComponent } from '../Component/header.component';
@@ -15,6 +26,12 @@ interface BeforeInstallPromptEvent extends Event {
 
 type TimeFilterKey = 'all' | 'morning' | 'afternoon' | 'night';
 
+interface TemperatureChartPoint {
+  index: number;
+  x: number;
+  y: number;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -22,9 +39,13 @@ type TimeFilterKey = 'all' | 'morning' | 'afternoon' | 'night';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly weatherService = inject(WeatherService);
   private deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
+  private interactionResetTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  @ViewChild('hourlyCarousel') private hourlyCarouselRef?: ElementRef<HTMLElement>;
+  @ViewChildren('hourChipButton') private hourChipButtonRefs?: QueryList<ElementRef<HTMLButtonElement>>;
   title = 'Nimbus';
   currentLocation = 'Obteniendo ubicacion precisa...';
   currentTemperature: number | null = null;
@@ -38,6 +59,8 @@ export class HomeComponent implements OnInit {
   windDirectionDegrees: number | null = null;
   uvIndex: number | null = null;
   forecast24h: HourlyForecast[] = [];
+  selectedForecastIndex = 0;
+  activeInteractionIndex: number | null = null;
   selectedTimeFilter: TimeFilterKey = 'all';
   errorMessage = '';
   isLoading = true;
@@ -80,6 +103,129 @@ export class HomeComponent implements OnInit {
 
     // Fallback: si no hay datos en ese tramo, se evita dejar la UI vacia.
     return filtered.length > 0 ? filtered : this.forecast24h;
+  }
+
+  get selectedForecast(): HourlyForecast | null {
+    if (this.forecast24h.length === 0) {
+      return null;
+    }
+
+    const boundedIndex = Math.max(0, Math.min(this.selectedForecastIndex, this.forecast24h.length - 1));
+    return this.forecast24h[boundedIndex] ?? null;
+  }
+
+  get temperatureChartPoints(): TemperatureChartPoint[] {
+    if (this.forecast24h.length === 0) {
+      return [];
+    }
+
+    const temperatures = this.forecast24h.map((item) => item.temperature);
+    const minTemp = Math.min(...temperatures);
+    const maxTemp = Math.max(...temperatures);
+    const spread = Math.max(1, maxTemp - minTemp);
+
+    return this.forecast24h.map((item, index) => {
+      const x = this.forecast24h.length === 1 ? 50 : (index / (this.forecast24h.length - 1)) * 100;
+      const normalized = (item.temperature - minTemp) / spread;
+      const y = 88 - (normalized * 64);
+
+      return {
+        index,
+        x,
+        y
+      };
+    });
+  }
+
+  get temperatureChartLinePath(): string {
+    const points = this.temperatureChartPoints;
+
+    if (points.length === 0) {
+      return '';
+    }
+
+    if (points.length === 1) {
+      return `M ${points[0].x} ${points[0].y}`;
+    }
+
+    let path = `M ${points[0].x} ${points[0].y}`;
+
+    for (let i = 1; i < points.length; i += 1) {
+      const previous = points[i - 1];
+      const current = points[i];
+      const controlX = previous.x + ((current.x - previous.x) / 2);
+
+      path += ` C ${controlX} ${previous.y}, ${controlX} ${current.y}, ${current.x} ${current.y}`;
+    }
+
+    return path;
+  }
+
+  get temperatureChartAreaPath(): string {
+    const points = this.temperatureChartPoints;
+
+    if (points.length === 0) {
+      return '';
+    }
+
+    const line = this.temperatureChartLinePath;
+    const first = points[0];
+    const last = points[points.length - 1];
+    return `${line} L ${last.x} 94 L ${first.x} 94 Z`;
+  }
+
+  get chartGradientStart(): string {
+    const segment = this.getSelectedHourSegment();
+
+    if (segment === 'morning') {
+      return 'rgba(255, 198, 126, 0.38)';
+    }
+
+    if (segment === 'afternoon') {
+      return 'rgba(128, 214, 255, 0.38)';
+    }
+
+    if (segment === 'night') {
+      return 'rgba(111, 148, 255, 0.34)';
+    }
+
+    return 'rgba(155, 220, 255, 0.36)';
+  }
+
+  get chartGradientMiddle(): string {
+    const segment = this.getSelectedHourSegment();
+
+    if (segment === 'morning') {
+      return 'rgba(140, 210, 255, 0.26)';
+    }
+
+    if (segment === 'afternoon') {
+      return 'rgba(109, 189, 255, 0.24)';
+    }
+
+    if (segment === 'night') {
+      return 'rgba(77, 126, 218, 0.24)';
+    }
+
+    return 'rgba(121, 205, 255, 0.24)';
+  }
+
+  get chartGradientEnd(): string {
+    const segment = this.getSelectedHourSegment();
+
+    if (segment === 'morning') {
+      return 'rgba(76, 153, 236, 0.06)';
+    }
+
+    if (segment === 'afternoon') {
+      return 'rgba(63, 130, 212, 0.06)';
+    }
+
+    if (segment === 'night') {
+      return 'rgba(50, 88, 169, 0.06)';
+    }
+
+    return 'rgba(71, 141, 224, 0.06)';
   }
 
   get next24hMinTemperature(): number | null {
@@ -234,6 +380,12 @@ export class HomeComponent implements OnInit {
     this.selectedTimeFilter = filter;
   }
 
+  selectForecast(index: number): void {
+    this.selectedForecastIndex = Math.max(0, Math.min(index, this.forecast24h.length - 1));
+    this.triggerInteractionFeedback(this.selectedForecastIndex);
+    this.scrollSelectedHourIntoView('smooth');
+  }
+
   getRainRiskLabel(probability: number | null): string {
     if (probability === null) {
       return 'Riesgo bajo';
@@ -262,6 +414,46 @@ export class HomeComponent implements OnInit {
     return 'rain-risk-high';
   }
 
+  getEstimatedFeelsLike(item: HourlyForecast | null): number | null {
+    if (!item) {
+      return null;
+    }
+
+    let estimated = item.temperature;
+
+    if (item.humidity !== null && item.humidity >= 75) {
+      estimated += 1;
+    }
+
+    if (item.windSpeed !== null && item.windSpeed >= 18) {
+      estimated -= 1;
+    }
+
+    return Math.round(estimated);
+  }
+
+  getEstimatedUvForHour(item: HourlyForecast | null): number | null {
+    if (!item || this.uvIndex === null) {
+      return null;
+    }
+
+    const hour = this.extractHourValue(item.hour);
+
+    if (hour === null || hour >= 20 || hour < 6) {
+      return 0;
+    }
+
+    let factor = 0.45;
+
+    if (hour >= 11 && hour <= 15) {
+      factor = 1;
+    } else if ((hour >= 9 && hour < 11) || (hour > 15 && hour <= 17)) {
+      factor = 0.72;
+    }
+
+    return Math.min(11, Math.round(this.uvIndex * factor * 10) / 10);
+  }
+
   @HostListener('window:beforeinstallprompt', ['$event'])
   onBeforeInstallPrompt(event: Event): void {
     event.preventDefault();
@@ -275,6 +467,23 @@ export class HomeComponent implements OnInit {
     this.deferredInstallPrompt = null;
     this.canInstallApp = false;
     this.isInstallPromptVisible = false;
+  }
+
+  ngAfterViewInit(): void {
+    this.hourChipButtonRefs?.changes.subscribe(() => {
+      this.scrollSelectedHourIntoView('auto');
+    });
+
+    queueMicrotask(() => {
+      this.scrollSelectedHourIntoView('auto');
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.interactionResetTimeout) {
+      clearTimeout(this.interactionResetTimeout);
+      this.interactionResetTimeout = null;
+    }
   }
 
   ngOnInit(): void {
@@ -317,6 +526,10 @@ export class HomeComponent implements OnInit {
               this.windDirectionDegrees = weather.windDirectionDegrees;
               this.uvIndex = weather.uvIndex;
               this.forecast24h = weather.hourly24h;
+              this.selectedForecastIndex = 0;
+              queueMicrotask(() => {
+                this.scrollSelectedHourIntoView('auto');
+              });
               this.errorMessage = '';
             },
             error: (error: HttpErrorResponse) => {
@@ -396,5 +609,62 @@ export class HomeComponent implements OnInit {
 
     const parsed = Number(match[1]);
     return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  private getSelectedHourSegment(): TimeFilterKey {
+    const selected = this.selectedForecast;
+
+    if (!selected) {
+      return 'all';
+    }
+
+    const hour = this.extractHourValue(selected.hour);
+
+    if (hour === null) {
+      return 'all';
+    }
+
+    if (hour >= 6 && hour < 12) {
+      return 'morning';
+    }
+
+    if (hour >= 12 && hour < 18) {
+      return 'afternoon';
+    }
+
+    return 'night';
+  }
+
+  private triggerInteractionFeedback(index: number): void {
+    this.activeInteractionIndex = index;
+
+    if (this.interactionResetTimeout) {
+      clearTimeout(this.interactionResetTimeout);
+    }
+
+    this.interactionResetTimeout = setTimeout(() => {
+      this.activeInteractionIndex = null;
+      this.interactionResetTimeout = null;
+    }, 280);
+  }
+
+  private scrollSelectedHourIntoView(behavior: ScrollBehavior): void {
+    const buttons = this.hourChipButtonRefs?.toArray() ?? [];
+    const selectedButton = buttons[this.selectedForecastIndex]?.nativeElement;
+
+    if (!selectedButton) {
+      return;
+    }
+
+    selectedButton.scrollIntoView({
+      behavior,
+      block: 'nearest',
+      inline: 'center'
+    });
+
+    if (this.hourlyCarouselRef?.nativeElement) {
+      this.hourlyCarouselRef.nativeElement.classList.add('is-snapping');
+      setTimeout(() => this.hourlyCarouselRef?.nativeElement.classList.remove('is-snapping'), 180);
+    }
   }
 }

@@ -85,8 +85,9 @@
     <article class="detail-card detail-forecast24h glass-card feature-panel">
       <div class="panel-head">
         <h3>Clima en 24 horas</h3>
-        <span>{{ next24hDominantCondition }}</span>
+        <span>{{ selectedForecast?.hour ?? '--:--' }}</span>
       </div>
+
       <div class="forecast-summary-row">
         <div class="forecast-summary-chip">
           <span>Min 24h</span>
@@ -102,49 +103,109 @@
         </div>
       </div>
 
-      <div class="forecast-filter-row" role="tablist" aria-label="Filtro por tramo horario">
-        @for (filter of timeFilters; track filter.key) {
+      <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
+        <svg class="temperature-chart" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Linea de temperatura por hora">
+          <defs>
+            <linearGradient id="temperature-area-gradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" [attr.stop-color]="chartGradientStart"></stop>
+              <stop offset="52%" [attr.stop-color]="chartGradientMiddle"></stop>
+              <stop offset="100%" [attr.stop-color]="chartGradientEnd"></stop>
+            </linearGradient>
+          </defs>
+
+          <line x1="0" y1="22" x2="100" y2="22" class="chart-grid"></line>
+          <line x1="0" y1="55" x2="100" y2="55" class="chart-grid"></line>
+          <line x1="0" y1="88" x2="100" y2="88" class="chart-grid"></line>
+
+          <path class="chart-area" [attr.d]="temperatureChartAreaPath"></path>
+          <path class="chart-line" [attr.d]="temperatureChartLinePath"></path>
+
+          @for (point of temperatureChartPoints; track point.index) {
+            <circle
+              class="chart-point"
+              [class.is-selected]="selectedForecastIndex === point.index"
+              [class.is-pressed]="activeInteractionIndex === point.index"
+              [attr.cx]="point.x"
+              [attr.cy]="point.y"
+              r="2.2"
+            ></circle>
+          }
+        </svg>
+
+        <div class="chart-hit-layer" aria-hidden="false">
+          @for (point of temperatureChartPoints; track point.index) {
+            <button
+              type="button"
+              class="chart-hit"
+              [style.left.%]="point.x"
+              [class.is-selected]="selectedForecastIndex === point.index"
+              [class.is-pressed]="activeInteractionIndex === point.index"
+              (click)="selectForecast(point.index)"
+              [attr.aria-label]="'Seleccionar hora ' + forecast24h[point.index].hour"
+            ></button>
+          }
+        </div>
+      </div>
+
+      <div #hourlyCarousel class="hourly-carousel" aria-label="Carrusel de horas">
+        @for (item of forecast24h; track item.hour; let i = $index) {
           <button
-            class="forecast-filter"
+            #hourChipButton
             type="button"
-            [class.is-active]="selectedTimeFilter === filter.key"
-            (click)="setTimeFilter(filter.key)"
+            class="hour-chip"
+            [class.is-selected]="selectedForecastIndex === i"
+            [class.is-pressed]="activeInteractionIndex === i"
+            (click)="selectForecast(i)"
           >
-            {{ filter.label }}
+            <span class="hour-chip-time">{{ item.hour }}</span>
+            @if (item.iconUrl) {
+              <img [src]="item.iconUrl" alt="icono clima" class="hour-chip-icon" />
+            } @else {
+              <span class="forecast-fallback">-</span>
+            }
+            <strong class="hour-chip-temp">{{ item.temperature }}°</strong>
           </button>
         }
       </div>
 
-      <div class="forecast-strip" aria-label="Pronostico por hora en 24hs">
-        @for (item of filteredForecast24h; track item.hour; let i = $index) {
-          <article class="forecast-tile" [class.is-now]="i === 0">
-            <div class="forecast-tile-main">
-              <div>
-                <span class="forecast-tile-time">{{ i === 0 ? 'Ahora' : item.hour }}</span>
-                <small class="forecast-tile-condition">{{ item.condition }}</small>
-              </div>
-
-              <div class="forecast-tile-icon">
-                @if (item.iconUrl) {
-                  <img [src]="item.iconUrl" alt="icono clima" class="forecast-icon" />
-                } @else {
-                  <span class="forecast-fallback">-</span>
-                }
-                <strong class="forecast-tile-temp">{{ item.temperature }}°</strong>
-              </div>
+      @if (selectedForecast; as selected) {
+        <article class="forecast-detail-card" [attr.data-hour]="selected.hour">
+          <div class="forecast-detail-top">
+            <div>
+              <p class="forecast-detail-time">{{ selected.hour }}</p>
+              <p class="forecast-detail-condition">{{ selected.condition }}</p>
             </div>
+            <p class="forecast-detail-temp">{{ selected.temperature }}°</p>
+          </div>
 
-            <div class="forecast-kpis">
-              <span class="forecast-kpi">Hum {{ item.humidity !== null ? item.humidity + '%' : '--' }}</span>
-              <span class="forecast-kpi">Vto {{ item.windSpeed !== null ? item.windSpeed + ' km/h' : '--' }}</span>
-              <span class="forecast-kpi forecast-kpi-rain">Lluvia {{ item.rainProbability !== null ? item.rainProbability + '%' : '--' }} · {{ item.rainMillimeters !== null ? item.rainMillimeters + ' mm' : '--' }}</span>
-              <span class="rain-risk-pill" [class]="'rain-risk-pill ' + getRainRiskClass(item.rainProbability)">
-                {{ getRainRiskLabel(item.rainProbability) }}
-              </span>
+          <div class="forecast-detail-grid">
+            <div class="forecast-detail-item">
+              <span>Sensacion</span>
+              <strong>{{ getEstimatedFeelsLike(selected) !== null ? getEstimatedFeelsLike(selected) + '°' : '--' }}</strong>
             </div>
-          </article>
-        }
-      </div>
+            <div class="forecast-detail-item">
+              <span>Humedad</span>
+              <strong>{{ selected.humidity !== null ? selected.humidity + '%' : '--' }}</strong>
+            </div>
+            <div class="forecast-detail-item">
+              <span>Viento</span>
+              <strong>{{ selected.windSpeed !== null ? selected.windSpeed + ' km/h' : '--' }} {{ windDirection ?? '--' }}</strong>
+            </div>
+            <div class="forecast-detail-item">
+              <span>Lluvia</span>
+              <strong>{{ selected.rainProbability !== null ? selected.rainProbability + '%' : '--' }} · {{ selected.rainMillimeters !== null ? selected.rainMillimeters + ' mm' : '--' }}</strong>
+            </div>
+            <div class="forecast-detail-item forecast-detail-risk">
+              <span>Riesgo</span>
+              <strong [class]="getRainRiskClass(selected.rainProbability)">{{ getRainRiskLabel(selected.rainProbability) }}</strong>
+            </div>
+            <div class="forecast-detail-item">
+              <span>UV est.</span>
+              <strong>{{ getEstimatedUvForHour(selected) !== null ? getEstimatedUvForHour(selected) : '--' }}</strong>
+            </div>
+          </div>
+        </article>
+      }
     </article>
 
     <article class="detail-card glass-card uv-card feature-panel">
