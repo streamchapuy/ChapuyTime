@@ -104,6 +104,12 @@
       </div>
 
       <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
+        <div class="chart-scale-labels" aria-hidden="true">
+          <span>{{ next24hMaxTemperature !== null ? next24hMaxTemperature + '°' : '--' }}</span>
+          <span>{{ currentTemperature !== null ? currentTemperature + '°' : '--' }}</span>
+          <span>{{ next24hMinTemperature !== null ? next24hMinTemperature + '°' : '--' }}</span>
+        </div>
+
         <svg class="temperature-chart" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Linea de temperatura por hora">
           <defs>
             <linearGradient id="temperature-area-gradient" x1="0" y1="0" x2="0" y2="1">
@@ -119,6 +125,11 @@
 
           <path class="chart-area" [attr.d]="temperatureChartAreaPath"></path>
           <path class="chart-line" [attr.d]="temperatureChartLinePath"></path>
+
+          @if (selectedChartPoint; as selectedPoint) {
+            <line class="chart-active-guide" [attr.x1]="selectedPoint.x" [attr.y1]="18" [attr.x2]="selectedPoint.x" [attr.y2]="94"></line>
+            <circle class="chart-active-halo" [attr.cx]="selectedPoint.x" [attr.cy]="selectedPoint.y" r="5"></circle>
+          }
 
           @for (point of temperatureChartPoints; track point.index) {
             <circle
@@ -144,6 +155,12 @@
               [attr.aria-label]="'Seleccionar hora ' + forecast24h[point.index].hour"
             ></button>
           }
+        </div>
+
+        <div class="chart-hours" aria-hidden="true">
+          <span>{{ forecast24h.length > 0 ? forecast24h[0].hour : '--:--' }}</span>
+          <span>{{ selectedForecast?.hour ?? '--:--' }}</span>
+          <span>{{ forecast24h.length > 0 ? forecast24h[forecast24h.length - 1].hour : '--:--' }}</span>
         </div>
       </div>
 

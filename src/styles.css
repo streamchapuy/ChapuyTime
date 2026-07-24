@@ -725,16 +725,35 @@ app-home .forecast-summary-chip:last-child strong {
 app-home .temperature-chart-card {
 	position: relative;
 	margin-top: 10px;
-	padding: 10px 8px 8px;
+	padding: 12px 10px 10px;
 	border-radius: 14px;
 	background: rgba(7, 30, 53, 0.34);
 	border: 1px solid rgba(255, 255, 255, 0.16);
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
+app-home .chart-scale-labels {
+	position: absolute;
+	left: 12px;
+	top: 12px;
+	bottom: 30px;
+	z-index: 3;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	pointer-events: none;
+}
+
+app-home .chart-scale-labels span {
+	font-size: 0.56rem;
+	letter-spacing: 0.08em;
+	color: rgba(228, 241, 255, 0.82);
+	text-shadow: 0 1px 2px rgba(3, 16, 30, 0.36);
+}
+
 app-home .temperature-chart {
 	width: 100%;
-	height: 98px;
+	height: 112px;
 	display: block;
 	overflow: visible;
 }
@@ -753,10 +772,22 @@ app-home .chart-area {
 app-home .chart-line {
 	fill: none;
 	stroke: rgba(154, 221, 255, 0.95);
-	stroke-width: 2.6;
+	stroke-width: 2.8;
 	stroke-linecap: round;
 	stroke-linejoin: round;
 	filter: drop-shadow(0 0 6px rgba(125, 210, 255, 0.35));
+}
+
+app-home .chart-active-guide {
+	stroke: rgba(201, 234, 255, 0.46);
+	stroke-width: 0.9;
+	stroke-dasharray: 1.8 2.4;
+}
+
+app-home .chart-active-halo {
+	fill: rgba(255, 255, 255, 0.24);
+	stroke: rgba(212, 240, 255, 0.92);
+	stroke-width: 0.8;
 }
 
 app-home .chart-point {
@@ -778,10 +809,10 @@ app-home .chart-point.is-pressed {
 
 app-home .chart-hit-layer {
 	position: absolute;
-	left: 8px;
-	right: 8px;
-	top: 10px;
-	height: 90px;
+	left: 10px;
+	right: 10px;
+	top: 12px;
+	height: 102px;
 }
 
 app-home .chart-hit {
@@ -809,13 +840,37 @@ app-home .chart-hit.is-pressed::after {
 	animation: chart-touch-ripple 280ms ease;
 }
 
-app-home .hourly-carousel {
+app-home .chart-hours {
+	margin-top: 4px;
 	display: flex;
-	gap: 8px;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 0 2px;
+}
+
+app-home .chart-hours span {
+	font-size: 0.58rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: rgba(236, 246, 255, 0.84);
+}
+
+app-home .chart-hours span:nth-child(2) {
+	font-weight: 700;
+	color: #ffffff;
+}
+
+app-home .hourly-carousel {
+	--hours-per-view: 4;
+	--hour-gap: 8px;
+	display: flex;
+	gap: var(--hour-gap);
 	overflow-x: auto;
 	overflow-y: hidden;
 	scroll-snap-type: x mandatory;
-	padding: 10px 0 2px;
+	padding: 10px 0 4px;
+	touch-action: pan-x;
+	scroll-padding-inline: 2px;
 	-webkit-overflow-scrolling: touch;
 	scrollbar-width: thin;
 	scrollbar-color: rgba(255, 255, 255, 0.28) rgba(255, 255, 255, 0.08);
@@ -841,7 +896,8 @@ app-home .hourly-carousel::-webkit-scrollbar-thumb {
 }
 
 app-home .hour-chip {
-	flex: 0 0 72px;
+	flex: 0 0 calc((100% - (var(--hour-gap) * (var(--hours-per-view) - 1))) / var(--hours-per-view));
+	max-width: calc((100% - (var(--hour-gap) * (var(--hours-per-view) - 1))) / var(--hours-per-view));
 	scroll-snap-align: start;
 	display: flex;
 	flex-direction: column;
@@ -1390,7 +1446,17 @@ app-home .install-button:disabled {
 	}
 
 	app-home .temperature-chart-card {
-		padding: 10px 8px;
+		padding: 12px 9px 9px;
+	}
+
+	app-home .chart-scale-labels {
+		left: 10px;
+		top: 12px;
+		bottom: 30px;
+	}
+
+	app-home .chart-scale-labels span {
+		font-size: 0.6rem;
 	}
 
 	app-home .temperature-chart,
@@ -1398,17 +1464,28 @@ app-home .install-button:disabled {
 		height: 120px;
 	}
 
+	app-home .chart-hit-layer {
+		left: 9px;
+		right: 9px;
+		top: 12px;
+	}
+
+	app-home .chart-hours span {
+		font-size: 0.62rem;
+	}
+
 	app-home .chart-hit {
 		width: 22px;
 	}
 
 	app-home .hourly-carousel {
-		gap: 7px;
+		--hour-gap: 7px;
 		padding-top: 9px;
 	}
 
 	app-home .hour-chip {
-		flex-basis: 78px;
+		flex-basis: calc((100% - (var(--hour-gap) * 3)) / 4);
+		max-width: calc((100% - (var(--hour-gap) * 3)) / 4);
 		padding: 9px 6px;
 	}
 
@@ -1493,7 +1570,8 @@ app-home .install-button:disabled {
 	}
 
 	app-home .hour-chip {
-		flex-basis: 74px;
+		flex-basis: calc((100% - (var(--hour-gap) * 3)) / 4);
+		max-width: calc((100% - (var(--hour-gap) * 3)) / 4);
 	}
 
 	app-home .detail-forecast24h {

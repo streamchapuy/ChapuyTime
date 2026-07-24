@@ -174,6 +174,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${line} L ${last.x} 94 L ${first.x} 94 Z`;
   }
 
+  get selectedChartPoint(): TemperatureChartPoint | null {
+    const points = this.temperatureChartPoints;
+
+    if (points.length === 0) {
+      return null;
+    }
+
+    return points[this.selectedForecastIndex] ?? null;
+  }
+
   get chartGradientStart(): string {
     const segment = this.getSelectedHourSegment();
 
