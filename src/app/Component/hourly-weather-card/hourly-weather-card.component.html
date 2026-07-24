@@ -1,0 +1,17 @@
+<button
+	type="button"
+	class="hour-chip"
+	[class.is-selected]="isSelected"
+	[class.is-pressed]="isPressed"
+	(click)="select()"
+	[attr.aria-label]="forecast.hour + ', ' + forecast.condition + ', ' + forecast.temperature + ' grados'"
+>
+	<span class="hour-chip-time">{{ forecast.hour }}</span>
+	@if (forecast.iconUrl) {
+		<img [src]="forecast.iconUrl" [alt]="forecast.condition" class="hour-chip-icon" />
+	} @else {
+		<span class="forecast-fallback">-</span>
+	}
+	<span class="hour-chip-condition" [title]="forecast.condition">{{ forecast.condition }}</span>
+	<strong class="hour-chip-temp">{{ forecast.temperature }}°</strong>
+</button>

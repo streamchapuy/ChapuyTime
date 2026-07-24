@@ -103,6 +103,18 @@
         </div>
       </div>
 
+      <div #hourlyCarousel class="hourly-carousel" aria-label="Carrusel de horas">
+        @for (item of forecast24h; track item.hour; let i = $index) {
+          <app-hourly-weather-card
+            #hourChipButton
+            [forecast]="item"
+            [isSelected]="selectedForecastIndex === i"
+            [isPressed]="activeInteractionIndex === i"
+            (forecastSelected)="selectForecast(i)"
+          ></app-hourly-weather-card>
+        }
+      </div>
+
       <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
         <div class="chart-scale-labels" aria-hidden="true">
           <span>{{ next24hMaxTemperature !== null ? next24hMaxTemperature + '°' : '--' }}</span>
@@ -162,29 +174,6 @@
           <span>{{ selectedForecast?.hour ?? '--:--' }}</span>
           <span>{{ forecast24h.length > 0 ? forecast24h[forecast24h.length - 1].hour : '--:--' }}</span>
         </div>
-      </div>
-
-      <div #hourlyCarousel class="hourly-carousel" aria-label="Carrusel de horas">
-        @for (item of forecast24h; track item.hour; let i = $index) {
-          <button
-            #hourChipButton
-            type="button"
-            class="hour-chip"
-            [class.is-selected]="selectedForecastIndex === i"
-            [class.is-pressed]="activeInteractionIndex === i"
-            (click)="selectForecast(i)"
-            [attr.aria-label]="item.hour + ', ' + item.condition + ', ' + item.temperature + ' grados'"
-          >
-            <span class="hour-chip-time">{{ item.hour }}</span>
-            @if (item.iconUrl) {
-              <img [src]="item.iconUrl" [alt]="item.condition" class="hour-chip-icon" />
-            } @else {
-              <span class="forecast-fallback">-</span>
-            }
-            <span class="hour-chip-condition" [title]="item.condition">{{ item.condition }}</span>
-            <strong class="hour-chip-temp">{{ item.temperature }}°</strong>
-          </button>
-        }
       </div>
 
       @if (selectedForecast; as selected) {

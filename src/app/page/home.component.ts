@@ -13,7 +13,8 @@ import {
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 
-import { HeaderComponent } from '../Component/header.component';
+import { HeaderComponent } from '../Component/header/header.component';
+import { HourlyWeatherCardComponent } from '../Component/hourly-weather-card/hourly-weather-card.component';
 import { HourlyForecast, WeatherService } from '../services/weather.service';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -35,7 +36,7 @@ interface TemperatureChartPoint {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [HeaderComponent],
+  imports: [HeaderComponent, HourlyWeatherCardComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -45,7 +46,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private interactionResetTimeout: ReturnType<typeof setTimeout> | null = null;
 
   @ViewChild('hourlyCarousel') private hourlyCarouselRef?: ElementRef<HTMLElement>;
-  @ViewChildren('hourChipButton') private hourChipButtonRefs?: QueryList<ElementRef<HTMLButtonElement>>;
+  @ViewChildren('hourChipButton') private hourChipButtonRefs?: QueryList<ElementRef<HTMLElement>>;
   title = 'Nimbus';
   currentLocation = 'Obteniendo ubicacion precisa...';
   currentTemperature: number | null = null;

@@ -4,7 +4,7 @@ import { Component, Input } from '@angular/core';
   selector: 'app-header',
   standalone: true,
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrl: './header.component.css'
 })
 export class HeaderComponent {
   @Input() title = 'Nimbus';
