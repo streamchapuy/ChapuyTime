@@ -896,8 +896,8 @@ app-home .hourly-carousel::-webkit-scrollbar-thumb {
 }
 
 app-home .hour-chip {
-	flex: 0 0 calc((100% - (var(--hour-gap) * (var(--hours-per-view) - 1))) / var(--hours-per-view));
-	max-width: calc((100% - (var(--hour-gap) * (var(--hours-per-view) - 1))) / var(--hours-per-view));
+	flex: 0 0 calc((100% - 24px) / 4);
+	max-width: calc((100% - 24px) / 4);
 	scroll-snap-align: start;
 	display: flex;
 	flex-direction: column;
@@ -1484,8 +1484,8 @@ app-home .install-button:disabled {
 	}
 
 	app-home .hour-chip {
-		flex-basis: calc((100% - (var(--hour-gap) * 3)) / 4);
-		max-width: calc((100% - (var(--hour-gap) * 3)) / 4);
+		flex-basis: calc((100% - 21px) / 4);
+		max-width: calc((100% - 21px) / 4);
 		padding: 9px 6px;
 	}
 
@@ -1570,8 +1570,8 @@ app-home .install-button:disabled {
 	}
 
 	app-home .hour-chip {
-		flex-basis: calc((100% - (var(--hour-gap) * 3)) / 4);
-		max-width: calc((100% - (var(--hour-gap) * 3)) / 4);
+		flex-basis: calc((100% - 21px) / 4);
+		max-width: calc((100% - 21px) / 4);
 	}
 
 	app-home .detail-forecast24h {
