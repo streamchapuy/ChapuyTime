@@ -173,13 +173,15 @@
             [class.is-selected]="selectedForecastIndex === i"
             [class.is-pressed]="activeInteractionIndex === i"
             (click)="selectForecast(i)"
+            [attr.aria-label]="item.hour + ', ' + item.condition + ', ' + item.temperature + ' grados'"
           >
             <span class="hour-chip-time">{{ item.hour }}</span>
             @if (item.iconUrl) {
-              <img [src]="item.iconUrl" alt="icono clima" class="hour-chip-icon" />
+              <img [src]="item.iconUrl" [alt]="item.condition" class="hour-chip-icon" />
             } @else {
               <span class="forecast-fallback">-</span>
             }
+            <span class="hour-chip-condition" [title]="item.condition">{{ item.condition }}</span>
             <strong class="hour-chip-temp">{{ item.temperature }}°</strong>
           </button>
         }
