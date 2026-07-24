@@ -677,7 +677,7 @@ app-home .detail-subtitle {
 
 app-home .detail-forecast24h {
 	grid-column: auto;
-	padding: 12px;
+	padding: 12px 8px;
 	background:
 		linear-gradient(155deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 100%),
 		rgba(229, 240, 252, 0.1);
@@ -864,7 +864,7 @@ app-home .chart-hours span:nth-child(2) {
 
 app-home .hourly-carousel {
 	--hours-per-view: 4;
-	--hour-gap: 8px;
+	--hour-gap: 6px;
 	display: flex;
 	gap: var(--hour-gap);
 	overflow-x: auto;
@@ -898,8 +898,8 @@ app-home .hourly-carousel::-webkit-scrollbar-thumb {
 }
 
 app-home app-hourly-weather-card {
-	flex: 0 0 calc((100% - 24px) / 4);
-	max-width: calc((100% - 24px) / 4);
+	flex: 0 0 calc((100% - 18px) / 4);
+	max-width: calc((100% - 18px) / 4);
 	scroll-snap-align: start;
 	display: block;
 	min-height: 112px;
@@ -1361,9 +1361,13 @@ app-home .install-button:disabled {
 		gap: 10px;
 	}
 
-	app-home .detail-card,
-	app-home .detail-forecast24h {
+	app-home .detail-card {
 		padding: 11px;
+		border-radius: 18px;
+	}
+
+	app-home .detail-forecast24h {
+		padding: 11px 7px;
 		border-radius: 18px;
 	}
 
@@ -1436,13 +1440,13 @@ app-home .install-button:disabled {
 	}
 
 	app-home .hourly-carousel {
-		--hour-gap: 7px;
+		--hour-gap: 6px;
 		padding-top: 9px;
 	}
 
 	app-home app-hourly-weather-card {
-		flex-basis: calc((100% - 21px) / 4);
-		max-width: calc((100% - 21px) / 4);
+		flex-basis: calc((100% - 18px) / 4);
+		max-width: calc((100% - 18px) / 4);
 		min-height: 118px;
 	}
 
@@ -1530,7 +1534,7 @@ app-home .install-button:disabled {
 	}
 
 	app-home .detail-forecast24h {
-		padding: 10px;
+		padding: 10px 6px;
 	}
 
 	app-home .forecast-summary-chip {
