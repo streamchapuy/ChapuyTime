@@ -379,6 +379,36 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.refreshTemperatureChart();
   }
 
+  private previewForecastFromChart(index: number): void {
+    if (this.forecast24h.length === 0) {
+      return;
+    }
+
+    const boundedIndex = Math.max(0, Math.min(index, this.forecast24h.length - 1));
+
+    if (boundedIndex === this.selectedForecastIndex) {
+      return;
+    }
+
+    this.selectedForecastIndex = boundedIndex;
+    this.scrollSelectedHourIntoView('smooth');
+    this.refreshTemperatureChart();
+  }
+
+  onChartPointerMove(event: PointerEvent): void {
+    if (this.forecast24h.length === 0) {
+      return;
+    }
+
+    const container = event.currentTarget as HTMLElement;
+    const rect = container.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left + container.scrollLeft;
+    const proportion = Math.max(0, Math.min(1, offsetX / container.scrollWidth));
+    const index = Math.round(proportion * (this.forecast24h.length - 1));
+
+    this.previewForecastFromChart(index);
+  }
+
   getRainRiskLabel(probability: number | null): string {
     if (probability === null) {
       return 'Riesgo bajo';

@@ -117,7 +117,10 @@
 
       <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
         @if (forecast24h.length > 0) {
-          <div class="temperature-chart-scroll">
+          <div
+            class="temperature-chart-scroll"
+            (pointermove)="onChartPointerMove($event)"
+          >
             <apx-chart
               class="temperature-chart"
               [series]="chartOptions.series"
