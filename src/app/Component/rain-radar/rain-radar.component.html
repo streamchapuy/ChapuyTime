@@ -1,0 +1,23 @@
+<div class="rain-radar">
+  <div #radarMap class="rain-radar-map" role="img" aria-label="Mapa de radar de lluvia"></div>
+
+  @if (isLoading) {
+    <div class="rain-radar-overlay">
+      <span class="rain-radar-spinner" aria-hidden="true"></span>
+      <p>Cargando radar...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="rain-radar-overlay">
+      <p class="rain-radar-error">{{ errorMessage }}</p>
+    </div>
+  }
+
+  @if (!isLoading && !errorMessage) {
+    <div class="rain-radar-controls">
+      <button type="button" class="rain-radar-play" (click)="togglePlayback()">
+        {{ isPlaying ? '⏸ Pausar' : '▶ Reproducir' }}
+      </button>
+      <span class="rain-radar-time">{{ frameTimeLabel }}</span>
+    </div>
+  }
+</div>

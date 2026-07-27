@@ -28,6 +28,7 @@ import {
 
 import { HeaderComponent } from '../Component/header/header.component';
 import { HourlyWeatherCardComponent } from '../Component/hourly-weather-card/hourly-weather-card.component';
+import { RainRadarComponent } from '../Component/rain-radar/rain-radar.component';
 import { HourlyForecast, WeatherService } from '../services/weather.service';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -57,7 +58,7 @@ interface TemperatureChartOptions {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [HeaderComponent, HourlyWeatherCardComponent, NgApexchartsModule],
+  imports: [HeaderComponent, HourlyWeatherCardComponent, RainRadarComponent, NgApexchartsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -70,6 +71,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChildren('hourChipButton') private hourChipButtonRefs?: QueryList<ElementRef<HTMLElement>>;
   title = 'Nimbus';
   currentLocation = 'Obteniendo ubicacion precisa...';
+  latitude: number | null = null;
+  longitude: number | null = null;
   currentTemperature: number | null = null;
   minTemperature: number | null = null;
   maxTemperature: number | null = null;
@@ -530,6 +533,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       ({ coords }) => {
         const latitude = coords.latitude;
         const longitude = coords.longitude;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.currentLocation = 'Ubicando...';
 
         this.weatherService

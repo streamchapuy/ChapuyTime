@@ -220,6 +220,24 @@
       </div>
       <p class="detail-subtitle">Direccion: {{ windDirection ?? '--' }}</p>
     </article>
+
+    <article class="detail-card glass-card feature-panel radar-card">
+      <div class="panel-head">
+        <h3>Radar de lluvia</h3>
+        <span>{{ latitude !== null && longitude !== null ? 'En vivo' : 'Sin ubicacion' }}</span>
+      </div>
+      @if (latitude !== null && longitude !== null) {
+        @defer (on viewport) {
+          <app-rain-radar [latitude]="latitude" [longitude]="longitude"></app-rain-radar>
+        } @placeholder {
+          <div class="radar-placeholder">Desliza para ver el radar</div>
+        } @loading {
+          <div class="radar-placeholder">Cargando radar...</div>
+        }
+      } @else {
+        <p class="chart-empty">Sin ubicacion disponible para el radar.</p>
+      }
+    </article>
   </section>
 
   @if (isInstallPromptVisible) {

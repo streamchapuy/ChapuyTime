@@ -786,6 +786,19 @@ app-home .chart-empty {
 	color: rgba(228, 241, 255, 0.7);
 }
 
+app-home .radar-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 220px;
+	border-radius: 12px;
+	background: rgba(7, 30, 53, 0.34);
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	color: rgba(228, 241, 255, 0.7);
+	font-size: 0.78rem;
+	text-align: center;
+}
+
 app-home .hourly-carousel {
 	--hours-per-view: 4;
 	--hour-gap: 4px;
