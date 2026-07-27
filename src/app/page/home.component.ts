@@ -12,6 +12,19 @@ import {
   inject
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
+import {
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexDataLabels,
+  ApexFill,
+  ApexGrid,
+  ApexMarkers,
+  ApexStroke,
+  ApexTooltip,
+  ApexXAxis,
+  ApexYAxis,
+  NgApexchartsModule
+} from 'ng-apexcharts';
 
 import { HeaderComponent } from '../Component/header/header.component';
 import { HourlyWeatherCardComponent } from '../Component/hourly-weather-card/hourly-weather-card.component';
@@ -27,16 +40,24 @@ interface BeforeInstallPromptEvent extends Event {
 
 type TimeFilterKey = 'all' | 'morning' | 'afternoon' | 'night';
 
-interface TemperatureChartPoint {
-  index: number;
-  x: number;
-  y: number;
+interface TemperatureChartOptions {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
+  stroke: ApexStroke;
+  fill: ApexFill;
+  dataLabels: ApexDataLabels;
+  markers: ApexMarkers;
+  grid: ApexGrid;
+  tooltip: ApexTooltip;
+  colors: string[];
 }
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [HeaderComponent, HourlyWeatherCardComponent],
+  imports: [HeaderComponent, HourlyWeatherCardComponent, NgApexchartsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -67,6 +88,77 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = true;
   canInstallApp = false;
   isInstallPromptVisible = false;
+
+  chartOptions: TemperatureChartOptions = {
+    series: [{ name: 'Temperatura', data: [] }],
+    chart: {
+      type: 'area',
+      height: 190,
+      background: 'transparent',
+      foreColor: 'rgba(228, 241, 255, 0.78)',
+      toolbar: { show: false },
+      zoom: { enabled: false },
+      animations: { enabled: true, easing: 'easeinout', speed: 350 },
+      events: {
+        dataPointSelection: (_event: unknown, _chartContext: unknown, config: { dataPointIndex: number }) => {
+          if (config && config.dataPointIndex >= 0) {
+            this.selectForecast(config.dataPointIndex);
+          }
+        }
+      }
+    },
+    xaxis: {
+      categories: [],
+      tickAmount: 6,
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+      labels: {
+        style: { colors: 'rgba(228, 241, 255, 0.7)', fontSize: '10px' }
+      }
+    },
+    yaxis: {
+      labels: {
+        formatter: (value: number) => `${Math.round(value)}\u00b0`,
+        style: { colors: 'rgba(228, 241, 255, 0.7)', fontSize: '10px' }
+      },
+      tickAmount: 3
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 3
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.45,
+        opacityTo: 0.04,
+        stops: [0, 90, 100]
+      }
+    },
+    dataLabels: { enabled: false },
+    markers: {
+      size: 0,
+      strokeWidth: 2,
+      hover: { size: 5 }
+    },
+    grid: {
+      show: true,
+      borderColor: 'rgba(232, 243, 255, 0.12)',
+      strokeDashArray: 4,
+      xaxis: { lines: { show: false } },
+      yaxis: { lines: { show: true } },
+      padding: { left: 8, right: 8 }
+    },
+    tooltip: {
+      theme: 'dark',
+      x: { show: true },
+      y: {
+        formatter: (value: number) => `${Math.round(value)}\u00b0C`
+      }
+    },
+    colors: ['#9bdcff']
+  };
 
   readonly timeFilters: Array<{ key: TimeFilterKey; label: string }> = [
     { key: 'all', label: 'Ahora' },
@@ -113,130 +205,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const boundedIndex = Math.max(0, Math.min(this.selectedForecastIndex, this.forecast24h.length - 1));
     return this.forecast24h[boundedIndex] ?? null;
-  }
-
-  get temperatureChartPoints(): TemperatureChartPoint[] {
-    if (this.forecast24h.length === 0) {
-      return [];
-    }
-
-    const temperatures = this.forecast24h.map((item) => item.temperature);
-    const minTemp = Math.min(...temperatures);
-    const maxTemp = Math.max(...temperatures);
-    const spread = Math.max(1, maxTemp - minTemp);
-
-    return this.forecast24h.map((item, index) => {
-      const x = this.forecast24h.length === 1 ? 50 : (index / (this.forecast24h.length - 1)) * 100;
-      const normalized = (item.temperature - minTemp) / spread;
-      const y = 76 - (normalized * 44);
-
-      return {
-        index,
-        x,
-        y
-      };
-    });
-  }
-
-  get temperatureChartLinePath(): string {
-    const points = this.temperatureChartPoints;
-
-    if (points.length === 0) {
-      return '';
-    }
-
-    if (points.length === 1) {
-      return `M ${points[0].x} ${points[0].y}`;
-    }
-
-    let path = `M ${points[0].x} ${points[0].y}`;
-
-    for (let i = 1; i < points.length; i += 1) {
-      const previous = points[i - 1];
-      const current = points[i];
-      const controlX = previous.x + ((current.x - previous.x) / 2);
-
-      path += ` C ${controlX} ${previous.y}, ${controlX} ${current.y}, ${current.x} ${current.y}`;
-    }
-
-    return path;
-  }
-
-  get temperatureChartAreaPath(): string {
-    const points = this.temperatureChartPoints;
-
-    if (points.length === 0) {
-      return '';
-    }
-
-    const line = this.temperatureChartLinePath;
-    const first = points[0];
-    const last = points[points.length - 1];
-    return `${line} L ${last.x} 94 L ${first.x} 94 Z`;
-  }
-
-  get selectedChartPoint(): TemperatureChartPoint | null {
-    const points = this.temperatureChartPoints;
-
-    if (points.length === 0) {
-      return null;
-    }
-
-    return points[this.selectedForecastIndex] ?? null;
-  }
-
-  get chartGradientStart(): string {
-    const segment = this.getSelectedHourSegment();
-
-    if (segment === 'morning') {
-      return 'rgba(255, 198, 126, 0.38)';
-    }
-
-    if (segment === 'afternoon') {
-      return 'rgba(128, 214, 255, 0.38)';
-    }
-
-    if (segment === 'night') {
-      return 'rgba(111, 148, 255, 0.34)';
-    }
-
-    return 'rgba(155, 220, 255, 0.36)';
-  }
-
-  get chartGradientMiddle(): string {
-    const segment = this.getSelectedHourSegment();
-
-    if (segment === 'morning') {
-      return 'rgba(140, 210, 255, 0.26)';
-    }
-
-    if (segment === 'afternoon') {
-      return 'rgba(109, 189, 255, 0.24)';
-    }
-
-    if (segment === 'night') {
-      return 'rgba(77, 126, 218, 0.24)';
-    }
-
-    return 'rgba(121, 205, 255, 0.24)';
-  }
-
-  get chartGradientEnd(): string {
-    const segment = this.getSelectedHourSegment();
-
-    if (segment === 'morning') {
-      return 'rgba(76, 153, 236, 0.06)';
-    }
-
-    if (segment === 'afternoon') {
-      return 'rgba(63, 130, 212, 0.06)';
-    }
-
-    if (segment === 'night') {
-      return 'rgba(50, 88, 169, 0.06)';
-    }
-
-    return 'rgba(71, 141, 224, 0.06)';
   }
 
   get next24hMinTemperature(): number | null {
@@ -395,6 +363,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedForecastIndex = Math.max(0, Math.min(index, this.forecast24h.length - 1));
     this.triggerInteractionFeedback(this.selectedForecastIndex);
     this.scrollSelectedHourIntoView('smooth');
+    this.refreshTemperatureChart();
   }
 
   getRainRiskLabel(probability: number | null): string {
@@ -538,6 +507,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
               this.uvIndex = weather.uvIndex;
               this.forecast24h = weather.hourly24h;
               this.selectedForecastIndex = 0;
+              this.refreshTemperatureChart();
               queueMicrotask(() => {
                 this.scrollSelectedHourIntoView('auto');
               });
@@ -553,6 +523,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
               this.windDirectionDegrees = null;
               this.uvIndex = null;
               this.forecast24h = [];
+              this.refreshTemperatureChart();
             }
           });
       },
@@ -566,6 +537,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.windDirectionDegrees = null;
         this.uvIndex = null;
         this.forecast24h = [];
+        this.refreshTemperatureChart();
         this.isLoading = false;
       },
       {
@@ -644,6 +616,47 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     return 'night';
+  }
+
+  private getChartAccentColor(segment: TimeFilterKey): string {
+    if (segment === 'morning') {
+      return '#ffc67e';
+    }
+
+    if (segment === 'afternoon') {
+      return '#80d6ff';
+    }
+
+    if (segment === 'night') {
+      return '#6f94ff';
+    }
+
+    return '#9bdcff';
+  }
+
+  private refreshTemperatureChart(): void {
+    const hours = this.forecast24h.map((item) => item.hour);
+    const temperatures = this.forecast24h.map((item) => item.temperature);
+    const accentColor = this.getChartAccentColor(this.getSelectedHourSegment());
+
+    this.chartOptions = {
+      ...this.chartOptions,
+      series: [{ name: 'Temperatura', data: temperatures }],
+      xaxis: { ...this.chartOptions.xaxis, categories: hours },
+      colors: [accentColor],
+      markers: {
+        ...this.chartOptions.markers,
+        discrete: temperatures.length > 0
+          ? [{
+              seriesIndex: 0,
+              dataPointIndex: this.selectedForecastIndex,
+              fillColor: '#ffffff',
+              strokeColor: accentColor,
+              size: 6
+            }]
+          : []
+      }
+    };
   }
 
   private triggerInteractionFeedback(index: number): void {

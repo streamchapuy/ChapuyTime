@@ -116,64 +116,24 @@
       </div>
 
       <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
-        <div class="chart-scale-labels" aria-hidden="true">
-          <span>{{ next24hMaxTemperature !== null ? next24hMaxTemperature + '°' : '--' }}</span>
-          <span>{{ currentTemperature !== null ? currentTemperature + '°' : '--' }}</span>
-          <span>{{ next24hMinTemperature !== null ? next24hMinTemperature + '°' : '--' }}</span>
-        </div>
-
-        <svg class="temperature-chart" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Linea de temperatura por hora">
-          <defs>
-            <linearGradient id="temperature-area-gradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" [attr.stop-color]="chartGradientStart"></stop>
-              <stop offset="52%" [attr.stop-color]="chartGradientMiddle"></stop>
-              <stop offset="100%" [attr.stop-color]="chartGradientEnd"></stop>
-            </linearGradient>
-          </defs>
-
-          <line x1="0" y1="22" x2="100" y2="22" class="chart-grid"></line>
-          <line x1="0" y1="55" x2="100" y2="55" class="chart-grid"></line>
-          <line x1="0" y1="88" x2="100" y2="88" class="chart-grid"></line>
-
-          <path class="chart-area" [attr.d]="temperatureChartAreaPath"></path>
-          <path class="chart-line" [attr.d]="temperatureChartLinePath"></path>
-
-          @if (selectedChartPoint; as selectedPoint) {
-            <line class="chart-active-guide" [attr.x1]="selectedPoint.x" [attr.y1]="18" [attr.x2]="selectedPoint.x" [attr.y2]="94"></line>
-            <circle class="chart-active-halo" [attr.cx]="selectedPoint.x" [attr.cy]="selectedPoint.y" r="5"></circle>
-          }
-
-          @for (point of temperatureChartPoints; track point.index) {
-            <circle
-              class="chart-point"
-              [class.is-selected]="selectedForecastIndex === point.index"
-              [class.is-pressed]="activeInteractionIndex === point.index"
-              [attr.cx]="point.x"
-              [attr.cy]="point.y"
-              r="2.2"
-            ></circle>
-          }
-        </svg>
-
-        <div class="chart-hit-layer" aria-hidden="false">
-          @for (point of temperatureChartPoints; track point.index) {
-            <button
-              type="button"
-              class="chart-hit"
-              [style.left.%]="point.x"
-              [class.is-selected]="selectedForecastIndex === point.index"
-              [class.is-pressed]="activeInteractionIndex === point.index"
-              (click)="selectForecast(point.index)"
-              [attr.aria-label]="'Seleccionar hora ' + forecast24h[point.index].hour"
-            ></button>
-          }
-        </div>
-
-        <div class="chart-hours" aria-hidden="true">
-          <span>{{ forecast24h.length > 0 ? forecast24h[0].hour : '--:--' }}</span>
-          <span>{{ selectedForecast?.hour ?? '--:--' }}</span>
-          <span>{{ forecast24h.length > 0 ? forecast24h[forecast24h.length - 1].hour : '--:--' }}</span>
-        </div>
+        @if (forecast24h.length > 0) {
+          <apx-chart
+            class="temperature-chart"
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [xaxis]="chartOptions.xaxis"
+            [yaxis]="chartOptions.yaxis"
+            [stroke]="chartOptions.stroke"
+            [fill]="chartOptions.fill"
+            [dataLabels]="chartOptions.dataLabels"
+            [markers]="chartOptions.markers"
+            [grid]="chartOptions.grid"
+            [tooltip]="chartOptions.tooltip"
+            [colors]="chartOptions.colors"
+          ></apx-chart>
+        } @else {
+          <p class="chart-empty">Sin datos para graficar.</p>
+        }
       </div>
 
       @if (selectedForecast; as selected) {
