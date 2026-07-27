@@ -739,6 +739,28 @@ app-home .temperature-chart {
 	width: 100%;
 }
 
+app-home .temperature-chart-scroll {
+	overflow-x: auto;
+	overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 255, 255, 0.28) rgba(255, 255, 255, 0.08);
+}
+
+app-home .temperature-chart-scroll::-webkit-scrollbar {
+	height: 4px;
+}
+
+app-home .temperature-chart-scroll::-webkit-scrollbar-track {
+	background: rgba(255, 255, 255, 0.08);
+	border-radius: 999px;
+}
+
+app-home .temperature-chart-scroll::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.28);
+	border-radius: 999px;
+}
+
 app-home .temperature-chart .apexcharts-canvas {
 	margin: 0 auto;
 }

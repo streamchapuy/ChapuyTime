@@ -93,6 +93,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     series: [{ name: 'Temperatura', data: [] }],
     chart: {
       type: 'area',
+      width: '100%',
       height: 190,
       background: 'transparent',
       foreColor: 'rgba(228, 241, 255, 0.78)',
@@ -109,10 +110,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     },
     xaxis: {
       categories: [],
-      tickAmount: 6,
+      tickAmount: undefined,
       axisBorder: { show: false },
       axisTicks: { show: false },
       labels: {
+        rotate: 0,
+        hideOverlappingLabels: false,
         style: { colors: 'rgba(228, 241, 255, 0.7)', fontSize: '10px' }
       }
     },
@@ -638,11 +641,20 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const hours = this.forecast24h.map((item) => item.hour);
     const temperatures = this.forecast24h.map((item) => item.temperature);
     const accentColor = this.getChartAccentColor(this.getSelectedHourSegment());
+    const chartWidth = hours.length > 0 ? Math.max(340, hours.length * 44) : '100%';
+    const chart = this.chartOptions.chart.width === chartWidth
+      ? this.chartOptions.chart
+      : { ...this.chartOptions.chart, width: chartWidth };
 
     this.chartOptions = {
       ...this.chartOptions,
+      chart,
       series: [{ name: 'Temperatura', data: temperatures }],
-      xaxis: { ...this.chartOptions.xaxis, categories: hours },
+      xaxis: {
+        ...this.chartOptions.xaxis,
+        categories: hours,
+        tickAmount: hours.length > 0 ? hours.length - 1 : undefined
+      },
       colors: [accentColor],
       markers: {
         ...this.chartOptions.markers,
