@@ -1529,11 +1529,6 @@ app-home .install-button:disabled {
 		height: 20px;
 	}
 
-	app-home .hour-chip {
-		flex-basis: calc((100% - 21px) / 4);
-		max-width: calc((100% - 21px) / 4);
-	}
-
 	app-home .detail-forecast24h {
 		padding: 10px 4px;
 	}
