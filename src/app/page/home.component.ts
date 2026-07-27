@@ -113,6 +113,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       tickAmount: undefined,
       axisBorder: { show: false },
       axisTicks: { show: false },
+      crosshairs: {
+        show: true,
+        position: 'back',
+        stroke: { color: 'rgba(201, 234, 255, 0.55)', width: 1, dashArray: 4 }
+      },
       labels: {
         rotate: 0,
         hideOverlappingLabels: false,
@@ -123,6 +128,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       labels: {
         formatter: (value: number) => `${Math.round(value)}\u00b0`,
         style: { colors: 'rgba(228, 241, 255, 0.7)', fontSize: '10px' }
+      },
+      crosshairs: {
+        show: true,
+        position: 'back',
+        stroke: { color: 'rgba(201, 234, 255, 0.55)', width: 1, dashArray: 4 }
       },
       tickAmount: 3
     },
