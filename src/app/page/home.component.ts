@@ -377,9 +377,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   selectForecast(index: number): void {
-    this.selectedForecastIndex = Math.max(0, Math.min(index, this.forecast24h.length - 1));
-    this.isForecastDetailVisible = true;
+    const boundedIndex = Math.max(0, Math.min(index, this.forecast24h.length - 1));
+    const isTogglingOff = this.isForecastDetailVisible && this.selectedForecastIndex === boundedIndex;
+
+    this.selectedForecastIndex = boundedIndex;
+    this.isForecastDetailVisible = !isTogglingOff;
     this.triggerInteractionFeedback(this.selectedForecastIndex);
+
+    if (isTogglingOff) {
+      return;
+    }
+
     this.scrollSelectedHourIntoView('smooth');
     this.refreshTemperatureChart();
   }
