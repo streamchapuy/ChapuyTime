@@ -4,103 +4,72 @@
   <section class="weather-main shell" aria-label="Clima actual">
     <article class="weather-card hero-card">
       <div class="hero-topline">
-        <p class="weather-label">Ciudad</p>
+        <h2 class="weather-city">{{ currentLocation }}</h2>
         <span class="live-pill">Live</span>
       </div>
 
-      <h2 class="weather-city">{{ currentLocation }}</h2>
-
-      <div class="weather-badges">
-        <span class="hero-chip">{{ weatherOutlookLabel }}</span>
-        @if (maxTemperature !== null && minTemperature !== null) {
-          <span class="hero-chip hero-chip-soft">H: {{ maxTemperature }}° · L: {{ minTemperature }}°</span>
-        }
-      </div>
+      <p class="weather-time">{{ currentTimeLabel }}</p>
 
       <div class="weather-temp-row">
-        <strong class="weather-temp">
-          {{ currentTemperature !== null ? currentTemperature + '°' : '--' }}
-        </strong>
         @if (weatherIconUrl) {
           <img class="weather-icon" [src]="weatherIconUrl" [alt]="currentCondition" />
         } @else {
           <span class="weather-sun" aria-hidden="true"></span>
         }
+        <strong class="weather-temp">
+          {{ currentTemperature !== null ? currentTemperature + '°C' : '--' }}
+        </strong>
       </div>
 
-      <div class="temperature-range-card" aria-label="Rango de temperatura">
-        <div class="temperature-range-head">
-          <span>Rango térmico</span>
-          <strong>{{ currentTemperature !== null ? currentTemperature + '° ahora' : 'Sin dato' }}</strong>
-        </div>
+      <p class="weather-condition">{{ weatherOutlookLabel }}</p>
 
-        <div class="temperature-range-graph">
-          <div class="temperature-range-scale">
-            <span>{{ minTemperature !== null ? minTemperature + '°' : '--' }}</span>
-            <span>{{ currentTemperature !== null ? currentTemperature + '°' : '--' }}</span>
-            <span>{{ maxTemperature !== null ? maxTemperature + '°' : '--' }}</span>
-          </div>
-
-          <div class="temperature-range-track">
-            <span class="temperature-range-fill"></span>
-            <span class="temperature-range-marker" [style.left.%]="temperatureRangeProgress"></span>
-          </div>
-
-          <div class="temperature-range-labels">
-            <div>
-              <span>Mín</span>
-              <strong>{{ minTemperature !== null ? minTemperature + '°' : '--' }}</strong>
-            </div>
-            <div class="temperature-range-center">
-              <span>Actual</span>
-              <strong>{{ currentTemperature !== null ? currentTemperature + '°' : '--' }}</strong>
-            </div>
-            <div>
-              <span>Máx</span>
-              <strong>{{ maxTemperature !== null ? maxTemperature + '°' : '--' }}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="weather-quick-stats" aria-label="Humedad y viento">
-        <div class="weather-quick-stat">
-          <span>Humedad</span>
-          <strong>{{ humidity !== null ? humidity + '%' : '--' }}</strong>
-        </div>
-        <div class="weather-quick-stat">
-          <span>Viento</span>
-          <strong>{{ windSpeed !== null ? windSpeed + ' km/h' : '--' }}</strong>
-          <small>{{ windDirection ?? 'Sin dirección' }}</small>
-        </div>
-      </div>
+      @if (feelsLikeTemperature !== null) {
+        <p class="weather-feels-like">Sensación {{ feelsLikeTemperature }}°C</p>
+      }
 
       @if (errorMessage) {
         <p class="weather-error">{{ errorMessage }}</p>
       }
+
+      <hr class="weather-divider" />
+
+      <div class="weather-maxmin-row">
+        <div class="weather-stat">
+          <span>Máx.</span>
+          <strong>{{ maxTemperature !== null ? maxTemperature + '°' : '--' }}</strong>
+        </div>
+        <div class="weather-stat">
+          <span>Mín.</span>
+          <strong>{{ minTemperature !== null ? minTemperature + '°' : '--' }}</strong>
+        </div>
+      </div>
+
+      <hr class="weather-divider" />
+
+      <div class="weather-rain-row">
+        <span>Probabilidad de lluvia</span>
+        <strong>{{ rainProbabilityToday !== null ? rainProbabilityToday + '%' : '--' }}</strong>
+      </div>
+
+      <hr class="weather-divider" />
+
+      <div class="weather-uvwind-row">
+        <div class="weather-stat">
+          <span>Índice UV</span>
+          <strong>{{ uvLevelLabel }}</strong>
+        </div>
+        <div class="weather-stat">
+          <span>Viento</span>
+          <strong>{{ windSpeed !== null ? windSpeed + ' km/h' : '--' }}</strong>
+        </div>
+      </div>
     </article>
   </section>
 
   <section class="details-main shell" aria-label="Detalle de clima">
     <article class="detail-card detail-forecast24h glass-card feature-panel">
       <div class="panel-head">
-        <h3>Clima en 24 horas</h3>
-        <span>{{ selectedForecast?.hour ?? '--:--' }}</span>
-      </div>
-
-      <div class="forecast-summary-row">
-        <div class="forecast-summary-chip">
-          <span>Min 24h</span>
-          <strong>{{ next24hMinTemperature !== null ? next24hMinTemperature + '°' : '--' }}</strong>
-        </div>
-        <div class="forecast-summary-chip">
-          <span>Max 24h</span>
-          <strong>{{ next24hMaxTemperature !== null ? next24hMaxTemperature + '°' : '--' }}</strong>
-        </div>
-        <div class="forecast-summary-chip">
-          <span>Tendencia</span>
-          <strong>{{ next24hDominantCondition }}</strong>
-        </div>
+        <h3>Pronóstico por horas</h3>
       </div>
 
       <div #hourlyCarousel class="hourly-carousel" aria-label="Carrusel de horas">
@@ -115,75 +84,31 @@
         }
       </div>
 
-      <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
-        @if (forecast24h.length > 0) {
-          <div
-            class="temperature-chart-scroll"
-            (pointermove)="onChartPointerMove($event)"
-          >
-            <apx-chart
-              class="temperature-chart"
-              [series]="chartOptions.series"
-              [chart]="chartOptions.chart"
-              [xaxis]="chartOptions.xaxis"
-              [yaxis]="chartOptions.yaxis"
-              [stroke]="chartOptions.stroke"
-              [fill]="chartOptions.fill"
-              [dataLabels]="chartOptions.dataLabels"
-              [markers]="chartOptions.markers"
-              [grid]="chartOptions.grid"
-              [tooltip]="chartOptions.tooltip"
-              [colors]="chartOptions.colors"
-            ></apx-chart>
-          </div>
-        } @else {
-          <p class="chart-empty">Sin datos para graficar.</p>
-        }
-      </div>
-
-      @if (!isForecastDetailVisible && forecast24h.length > 0) {
-        <p class="forecast-detail-hint">Toca una tarjeta de hora o el gráfico para ver el detalle.</p>
+      @if (forecast24h.length === 0) {
+        <p class="chart-empty">Sin datos para mostrar.</p>
       }
     </article>
 
-    <article class="detail-card glass-card uv-card feature-panel">
+    <article class="detail-card glass-card feature-panel daily-forecast-card">
       <div class="panel-head">
-        <h3>Indice UV</h3>
-        <span>{{ uvLevelLabel }}</span>
+        <h3>Próximos 7 días</h3>
       </div>
-      <p class="detail-value detail-value-hero">{{ uvIndex !== null ? uvIndex : '--' }}</p>
-      <p class="detail-subtitle">{{ uvLevelLabel }}</p>
-      <div class="uv-track">
-        <span class="uv-fill" [style.width.%]="uvProgress"></span>
-      </div>
-    </article>
 
-    <article class="detail-card glass-card feature-panel">
-      <div class="panel-head">
-        <h3>Humedad</h3>
-        <span>Feels</span>
+      <div class="daily-forecast-list">
+        @for (day of dailyForecast; track day.dayLabel + day.maxTemperature) {
+          <div class="daily-forecast-row">
+            <span class="daily-forecast-day">{{ day.dayLabel }}</span>
+            <span class="daily-forecast-temps">{{ day.maxTemperature }}°/{{ day.minTemperature }}°</span>
+            @if (day.iconUrl) {
+              <img class="daily-forecast-icon" [src]="day.iconUrl" [alt]="day.condition" />
+            }
+          </div>
+        }
       </div>
-      <p class="detail-value detail-value-hero">{{ humidity !== null ? humidity + '%' : '--' }}</p>
-    </article>
 
-    <article class="detail-card glass-card feature-panel">
-      <div class="panel-head">
-        <h3>Viento</h3>
-        <span>{{ windDirection ?? '--' }}</span>
-      </div>
-      <div class="wind-row">
-        <div>
-          <p class="detail-value detail-value-hero">{{ windSpeed !== null ? windSpeed + ' km/h' : '--' }}</p>
-          <p class="detail-subtitle">Velocidad</p>
-        </div>
-        <span
-          class="wind-direction-icon"
-          [class.no-data]="windDirectionDegrees === null"
-          [style.transform]="'rotate(' + (windDirectionDegrees ?? 0) + 'deg)'"
-          [attr.aria-label]="windDirection ? 'Direccion del viento ' + windDirection : 'Direccion del viento no disponible'"
-        ></span>
-      </div>
-      <p class="detail-subtitle">Direccion: {{ windDirection ?? '--' }}</p>
+      @if (dailyForecast.length === 0) {
+        <p class="chart-empty">Sin datos para mostrar.</p>
+      }
     </article>
 
     <article class="detail-card glass-card feature-panel radar-card">
@@ -204,48 +129,6 @@
       }
     </article>
   </section>
-
-  @if (isForecastDetailVisible && selectedForecast; as selected) {
-    <div class="forecast-detail-backdrop" (click)="closeForecastDetail()">
-      <article class="forecast-detail-card" [attr.data-hour]="selected.hour" (click)="$event.stopPropagation()">
-        <button type="button" class="forecast-detail-close" (click)="closeForecastDetail()" aria-label="Cerrar detalle">✕</button>
-        <div class="forecast-detail-top">
-          <div>
-            <p class="forecast-detail-time">{{ selected.hour }}</p>
-            <p class="forecast-detail-condition">{{ selected.condition }}</p>
-          </div>
-          <p class="forecast-detail-temp">{{ selected.temperature }}°</p>
-        </div>
-
-        <div class="forecast-detail-grid">
-          <div class="forecast-detail-item">
-            <span>Sensacion</span>
-            <strong>{{ getEstimatedFeelsLike(selected) !== null ? getEstimatedFeelsLike(selected) + '°' : '--' }}</strong>
-          </div>
-          <div class="forecast-detail-item">
-            <span>Humedad</span>
-            <strong>{{ selected.humidity !== null ? selected.humidity + '%' : '--' }}</strong>
-          </div>
-          <div class="forecast-detail-item">
-            <span>Viento</span>
-            <strong>{{ selected.windSpeed !== null ? selected.windSpeed + ' km/h' : '--' }} {{ windDirection ?? '--' }}</strong>
-          </div>
-          <div class="forecast-detail-item">
-            <span>Lluvia</span>
-            <strong>{{ selected.rainProbability !== null ? selected.rainProbability + '%' : '--' }} · {{ selected.rainMillimeters !== null ? selected.rainMillimeters + ' mm' : '--' }}</strong>
-          </div>
-          <div class="forecast-detail-item forecast-detail-risk">
-            <span>Riesgo</span>
-            <strong [class]="getRainRiskClass(selected.rainProbability)">{{ getRainRiskLabel(selected.rainProbability) }}</strong>
-          </div>
-          <div class="forecast-detail-item">
-            <span>UV est.</span>
-            <strong>{{ getEstimatedUvForHour(selected) !== null ? getEstimatedUvForHour(selected) : '--' }}</strong>
-          </div>
-        </div>
-      </article>
-    </div>
-  }
 
   @if (isInstallPromptVisible) {
     <section class="install-cta shell" aria-label="Instalar aplicacion">

@@ -7,6 +7,7 @@ import { NOMINATIM_REVERSE_GEOCODING_API_URL, OPENMETEO_FORECAST_API_URL } from 
 interface OpenMeteoForecastResponse {
   current?: {
     temperature_2m?: number;
+    apparent_temperature?: number;
     relative_humidity_2m?: number;
     weather_code?: number;
     wind_speed_10m?: number;
@@ -26,8 +27,11 @@ interface OpenMeteoForecastResponse {
     is_day?: number[];
   };
   daily?: {
+    time?: string[];
     temperature_2m_max?: number[];
     temperature_2m_min?: number[];
+    weather_code?: number[];
+    precipitation_probability_max?: number[];
   };
 }
 
@@ -51,6 +55,7 @@ interface NominatimReverseGeocodingResponse {
     hamlet?: string;
     suburb?: string;
     county?: string;
+    state?: string;
   };
 }
 
@@ -65,9 +70,18 @@ export interface HourlyForecast {
   rainMillimeters: number | null;
 }
 
+export interface DailyForecast {
+  dayLabel: string;
+  maxTemperature: number;
+  minTemperature: number;
+  condition: string;
+  iconUrl: string | null;
+}
+
 export interface WeatherSnapshot {
   location: string;
   temperature: number;
+  feelsLikeTemperature: number | null;
   minTemperature: number;
   maxTemperature: number;
   condition: string;
@@ -77,7 +91,10 @@ export interface WeatherSnapshot {
   windDirection: string | null;
   windDirectionDegrees: number | null;
   uvIndex: number | null;
+  rainProbabilityToday: number | null;
+  currentTimeLabel: string;
   hourly24h: HourlyForecast[];
+  dailyForecast: DailyForecast[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -119,10 +136,10 @@ export class WeatherService {
       .set('latitude', lat)
       .set('longitude', lon)
       .set('timezone', 'auto')
-      .set('current', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day')
+      .set('current', 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day')
       .set('hourly', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation_probability,precipitation,is_day')
-      .set('daily', 'temperature_2m_max,temperature_2m_min')
-      .set('forecast_days', '2');
+      .set('daily', 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max')
+      .set('forecast_days', '7');
 
     const reverseParams = new HttpParams()
       .set('format', 'jsonv2')
@@ -143,11 +160,13 @@ export class WeatherService {
         const windDirectionDegrees = this.normalizeDegrees(current?.wind_direction_10m);
         const currentTime = current?.time ?? null;
         const hourly24h = this.buildHourlyForecast(forecast, currentTime);
+        const dailyForecast = this.buildDailyForecast(forecast);
         const currentDescriptor = this.getWeatherDescriptor(current?.weather_code, current?.is_day);
 
         return {
           location: this.formatLocation(geocoding.address),
           temperature: this.toRoundedValue(current?.temperature_2m),
+          feelsLikeTemperature: current?.apparent_temperature !== undefined ? this.toRoundedValue(current.apparent_temperature) : null,
           minTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_min?.[0]),
           maxTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_max?.[0]),
           condition: currentDescriptor.label,
@@ -157,7 +176,10 @@ export class WeatherService {
           windDirection: this.toCardinalDirection(windDirectionDegrees),
           windDirectionDegrees,
           uvIndex: this.toNullableDecimal(current?.uv_index),
-          hourly24h
+          rainProbabilityToday: forecast.daily?.precipitation_probability_max?.[0] ?? null,
+          currentTimeLabel: this.getTimeLabel(currentTime),
+          hourly24h,
+          dailyForecast
         };
       })
     );
@@ -226,16 +248,17 @@ export class WeatherService {
   }
 
   private formatLocation(address?: NominatimReverseGeocodingResponse['address']): string {
-    return (
-      address?.city?.trim()
+    const city = address?.city?.trim()
       || address?.town?.trim()
       || address?.village?.trim()
       || address?.municipality?.trim()
       || address?.hamlet?.trim()
       || address?.suburb?.trim()
       || address?.county?.trim()
-      || 'Tu ciudad'
-    );
+      || 'Tu ciudad';
+
+    const state = address?.state?.trim();
+    return state && state !== city ? `${city}, ${state}` : city;
   }
 
   private getIconUrl(iconName: string | undefined): string | null {
@@ -279,5 +302,43 @@ export class WeatherService {
 
     const match = dateText.match(/(?:T|\s)(\d{2}:\d{2})/);
     return match ? match[1] : '--:--';
+  }
+
+  private getTimeLabel(dateText: string | null): string {
+    if (!dateText) {
+      return '--:--';
+    }
+
+    const match = dateText.match(/(\d{2}):(\d{2})/);
+
+    if (!match) {
+      return '--:--';
+    }
+
+    const hours24 = Number(match[1]);
+    const minutes = match[2];
+    const period = hours24 >= 12 ? 'PM' : 'AM';
+    const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+
+    return `${String(hours12).padStart(2, '0')}:${minutes} ${period}`;
+  }
+
+  private buildDailyForecast(forecast: OpenMeteoForecastResponse): DailyForecast[] {
+    const dayLabels = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
+    const times = forecast.daily?.time ?? [];
+
+    return times.map((date, index) => {
+      const descriptor = this.getWeatherDescriptor(forecast.daily?.weather_code?.[index], 1);
+      const parsedDate = new Date(`${date}T00:00:00`);
+      const dayLabel = Number.isNaN(parsedDate.getTime()) ? '--' : dayLabels[parsedDate.getDay()];
+
+      return {
+        dayLabel,
+        maxTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_max?.[index]),
+        minTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_min?.[index]),
+        condition: descriptor.label,
+        iconUrl: this.getIconUrl(descriptor.iconName)
+      };
+    });
   }
 }

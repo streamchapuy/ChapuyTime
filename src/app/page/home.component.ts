@@ -12,24 +12,11 @@ import {
   inject
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
-import {
-  ApexAxisChartSeries,
-  ApexChart,
-  ApexDataLabels,
-  ApexFill,
-  ApexGrid,
-  ApexMarkers,
-  ApexStroke,
-  ApexTooltip,
-  ApexXAxis,
-  ApexYAxis,
-  NgApexchartsModule
-} from 'ng-apexcharts';
 
 import { HeaderComponent } from '../Component/header/header.component';
 import { HourlyWeatherCardComponent } from '../Component/hourly-weather-card/hourly-weather-card.component';
 import { RainRadarComponent } from '../Component/rain-radar/rain-radar.component';
-import { HourlyForecast, WeatherService } from '../services/weather.service';
+import { DailyForecast, HourlyForecast, WeatherService } from '../services/weather.service';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -41,24 +28,10 @@ interface BeforeInstallPromptEvent extends Event {
 
 type TimeFilterKey = 'all' | 'morning' | 'afternoon' | 'night';
 
-interface TemperatureChartOptions {
-  series: ApexAxisChartSeries;
-  chart: ApexChart;
-  xaxis: ApexXAxis;
-  yaxis: ApexYAxis;
-  stroke: ApexStroke;
-  fill: ApexFill;
-  dataLabels: ApexDataLabels;
-  markers: ApexMarkers;
-  grid: ApexGrid;
-  tooltip: ApexTooltip;
-  colors: string[];
-}
-
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [HeaderComponent, HourlyWeatherCardComponent, RainRadarComponent, NgApexchartsModule],
+  imports: [HeaderComponent, HourlyWeatherCardComponent, RainRadarComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -74,6 +47,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   latitude: number | null = null;
   longitude: number | null = null;
   currentTemperature: number | null = null;
+  feelsLikeTemperature: number | null = null;
   minTemperature: number | null = null;
   maxTemperature: number | null = null;
   currentCondition = 'Loading weather...';
@@ -83,99 +57,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   windDirection: string | null = null;
   windDirectionDegrees: number | null = null;
   uvIndex: number | null = null;
+  rainProbabilityToday: number | null = null;
+  currentTimeLabel = '--:--';
   forecast24h: HourlyForecast[] = [];
+  dailyForecast: DailyForecast[] = [];
   selectedForecastIndex = 0;
-  isForecastDetailVisible = false;
   activeInteractionIndex: number | null = null;
   selectedTimeFilter: TimeFilterKey = 'all';
   errorMessage = '';
   isLoading = true;
   canInstallApp = false;
   isInstallPromptVisible = false;
-
-  chartOptions: TemperatureChartOptions = {
-    series: [{ name: 'Temperatura', data: [] }],
-    chart: {
-      type: 'area',
-      width: '100%',
-      height: 190,
-      background: 'transparent',
-      foreColor: 'rgba(228, 241, 255, 0.78)',
-      toolbar: { show: false },
-      zoom: { enabled: false },
-      animations: { enabled: true, easing: 'easeinout', speed: 350 },
-      events: {
-        dataPointSelection: (_event: unknown, _chartContext: unknown, config: { dataPointIndex: number }) => {
-          if (config && config.dataPointIndex >= 0) {
-            this.selectForecast(config.dataPointIndex);
-          }
-        }
-      }
-    },
-    xaxis: {
-      categories: [],
-      tickAmount: undefined,
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-      crosshairs: {
-        show: true,
-        position: 'back',
-        stroke: { color: 'rgba(201, 234, 255, 0.55)', width: 1, dashArray: 4 }
-      },
-      labels: {
-        rotate: 0,
-        hideOverlappingLabels: false,
-        style: { colors: 'rgba(228, 241, 255, 0.7)', fontSize: '10px' }
-      }
-    },
-    yaxis: {
-      labels: {
-        formatter: (value: number) => `${Math.round(value)}\u00b0`,
-        style: { colors: 'rgba(228, 241, 255, 0.7)', fontSize: '10px' }
-      },
-      crosshairs: {
-        show: true,
-        position: 'back',
-        stroke: { color: 'rgba(201, 234, 255, 0.55)', width: 1, dashArray: 4 }
-      },
-      tickAmount: 3
-    },
-    stroke: {
-      curve: 'smooth',
-      width: 3
-    },
-    fill: {
-      type: 'gradient',
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.45,
-        opacityTo: 0.04,
-        stops: [0, 90, 100]
-      }
-    },
-    dataLabels: { enabled: false },
-    markers: {
-      size: 0,
-      strokeWidth: 2,
-      hover: { size: 5 }
-    },
-    grid: {
-      show: true,
-      borderColor: 'rgba(232, 243, 255, 0.12)',
-      strokeDashArray: 4,
-      xaxis: { lines: { show: false } },
-      yaxis: { lines: { show: true } },
-      padding: { left: 8, right: 8 }
-    },
-    tooltip: {
-      theme: 'dark',
-      x: { show: true },
-      y: {
-        formatter: (value: number) => `${Math.round(value)}\u00b0C`
-      }
-    },
-    colors: ['#9bdcff']
-  };
 
   readonly timeFilters: Array<{ key: TimeFilterKey; label: string }> = [
     { key: 'all', label: 'Ahora' },
@@ -224,46 +116,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.forecast24h[boundedIndex] ?? null;
   }
 
-  get next24hMinTemperature(): number | null {
-    if (this.forecast24h.length === 0) {
-      return null;
-    }
-
-    return Math.min(...this.forecast24h.map((item) => item.temperature));
-  }
-
-  get next24hMaxTemperature(): number | null {
-    if (this.forecast24h.length === 0) {
-      return null;
-    }
-
-    return Math.max(...this.forecast24h.map((item) => item.temperature));
-  }
-
-  get next24hDominantCondition(): string {
-    if (this.forecast24h.length === 0) {
-      return 'Sin datos';
-    }
-
-    const counts = new Map<string, number>();
-
-    for (const item of this.forecast24h) {
-      counts.set(item.condition, (counts.get(item.condition) ?? 0) + 1);
-    }
-
-    let dominantCondition = this.forecast24h[0].condition;
-    let highestCount = 0;
-
-    for (const [condition, count] of counts.entries()) {
-      if (count > highestCount) {
-        dominantCondition = condition;
-        highestCount = count;
-      }
-    }
-
-    return dominantCondition;
-  }
-
   get uvLevelLabel(): string {
     if (this.uvIndex === null) {
       return 'Sin datos';
@@ -294,20 +146,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     return Math.max(0, Math.min(100, (this.uvIndex / 11) * 100));
-  }
-
-  get temperatureRangeProgress(): number {
-    if (
-      this.currentTemperature === null
-      || this.minTemperature === null
-      || this.maxTemperature === null
-      || this.maxTemperature === this.minTemperature
-    ) {
-      return 0;
-    }
-
-    const normalized = ((this.currentTemperature - this.minTemperature) / (this.maxTemperature - this.minTemperature)) * 100;
-    return Math.max(0, Math.min(100, normalized));
   }
 
   get weatherThemeClass(): string {
@@ -378,120 +216,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectForecast(index: number): void {
     const boundedIndex = Math.max(0, Math.min(index, this.forecast24h.length - 1));
-    const isTogglingOff = this.isForecastDetailVisible && this.selectedForecastIndex === boundedIndex;
 
     this.selectedForecastIndex = boundedIndex;
-    this.isForecastDetailVisible = !isTogglingOff;
     this.triggerInteractionFeedback(this.selectedForecastIndex);
-
-    if (isTogglingOff) {
-      return;
-    }
-
     this.scrollSelectedHourIntoView('smooth');
-    this.refreshTemperatureChart();
-  }
-
-  closeForecastDetail(): void {
-    this.isForecastDetailVisible = false;
-  }
-
-  private previewForecastFromChart(index: number): void {
-    if (this.forecast24h.length === 0) {
-      return;
-    }
-
-    const boundedIndex = Math.max(0, Math.min(index, this.forecast24h.length - 1));
-
-    if (boundedIndex === this.selectedForecastIndex) {
-      return;
-    }
-
-    this.selectedForecastIndex = boundedIndex;
-    this.scrollSelectedHourIntoView('smooth');
-    this.refreshTemperatureChart();
-  }
-
-  onChartPointerMove(event: PointerEvent): void {
-    if (this.forecast24h.length === 0) {
-      return;
-    }
-
-    const container = event.currentTarget as HTMLElement;
-    const rect = container.getBoundingClientRect();
-    const offsetX = event.clientX - rect.left + container.scrollLeft;
-    const proportion = Math.max(0, Math.min(1, offsetX / container.scrollWidth));
-    const index = Math.round(proportion * (this.forecast24h.length - 1));
-
-    this.previewForecastFromChart(index);
-  }
-
-  getRainRiskLabel(probability: number | null): string {
-    if (probability === null) {
-      return 'Riesgo bajo';
-    }
-
-    if (probability >= 60) {
-      return 'Riesgo alto';
-    }
-
-    if (probability >= 30) {
-      return 'Riesgo medio';
-    }
-
-    return 'Riesgo bajo';
-  }
-
-  getRainRiskClass(probability: number | null): string {
-    if (probability === null || probability < 30) {
-      return 'rain-risk-low';
-    }
-
-    if (probability < 60) {
-      return 'rain-risk-medium';
-    }
-
-    return 'rain-risk-high';
-  }
-
-  getEstimatedFeelsLike(item: HourlyForecast | null): number | null {
-    if (!item) {
-      return null;
-    }
-
-    let estimated = item.temperature;
-
-    if (item.humidity !== null && item.humidity >= 75) {
-      estimated += 1;
-    }
-
-    if (item.windSpeed !== null && item.windSpeed >= 18) {
-      estimated -= 1;
-    }
-
-    return Math.round(estimated);
-  }
-
-  getEstimatedUvForHour(item: HourlyForecast | null): number | null {
-    if (!item || this.uvIndex === null) {
-      return null;
-    }
-
-    const hour = this.extractHourValue(item.hour);
-
-    if (hour === null || hour >= 20 || hour < 6) {
-      return 0;
-    }
-
-    let factor = 0.45;
-
-    if (hour >= 11 && hour <= 15) {
-      factor = 1;
-    } else if ((hour >= 9 && hour < 11) || (hour > 15 && hour <= 17)) {
-      factor = 0.72;
-    }
-
-    return Math.min(11, Math.round(this.uvIndex * factor * 10) / 10);
   }
 
   @HostListener('window:beforeinstallprompt', ['$event'])
@@ -558,6 +286,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             next: (weather) => {
               this.currentLocation = weather.location;
               this.currentTemperature = weather.temperature;
+              this.feelsLikeTemperature = weather.feelsLikeTemperature;
               this.minTemperature = weather.minTemperature;
               this.maxTemperature = weather.maxTemperature;
               this.currentCondition = weather.condition;
@@ -567,10 +296,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
               this.windDirection = weather.windDirection;
               this.windDirectionDegrees = weather.windDirectionDegrees;
               this.uvIndex = weather.uvIndex;
+              this.rainProbabilityToday = weather.rainProbabilityToday;
+              this.currentTimeLabel = weather.currentTimeLabel;
               this.forecast24h = weather.hourly24h;
+              this.dailyForecast = weather.dailyForecast;
               this.selectedForecastIndex = 0;
-              this.isForecastDetailVisible = false;
-              this.refreshTemperatureChart();
               queueMicrotask(() => {
                 this.scrollSelectedHourIntoView('auto');
               });
@@ -580,13 +310,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
               this.errorMessage = this.resolveErrorMessage(error);
               this.currentCondition = 'Weather unavailable';
               this.weatherIconUrl = null;
+              this.feelsLikeTemperature = null;
               this.humidity = null;
               this.windSpeed = null;
               this.windDirection = null;
               this.windDirectionDegrees = null;
               this.uvIndex = null;
+              this.rainProbabilityToday = null;
               this.forecast24h = [];
-              this.refreshTemperatureChart();
+              this.dailyForecast = [];
             }
           });
       },
@@ -594,13 +326,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.errorMessage = 'No fue posible obtener tu ubicacion actual.';
         this.currentCondition = 'Location unavailable';
         this.weatherIconUrl = null;
+        this.feelsLikeTemperature = null;
         this.humidity = null;
         this.windSpeed = null;
         this.windDirection = null;
         this.windDirectionDegrees = null;
         this.uvIndex = null;
+        this.rainProbabilityToday = null;
         this.forecast24h = [];
-        this.refreshTemperatureChart();
+        this.dailyForecast = [];
         this.isLoading = false;
       },
       {
@@ -655,80 +389,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const parsed = Number(match[1]);
     return Number.isNaN(parsed) ? null : parsed;
-  }
-
-  private getSelectedHourSegment(): TimeFilterKey {
-    const selected = this.selectedForecast;
-
-    if (!selected) {
-      return 'all';
-    }
-
-    const hour = this.extractHourValue(selected.hour);
-
-    if (hour === null) {
-      return 'all';
-    }
-
-    if (hour >= 6 && hour < 12) {
-      return 'morning';
-    }
-
-    if (hour >= 12 && hour < 18) {
-      return 'afternoon';
-    }
-
-    return 'night';
-  }
-
-  private getChartAccentColor(segment: TimeFilterKey): string {
-    if (segment === 'morning') {
-      return '#ffc67e';
-    }
-
-    if (segment === 'afternoon') {
-      return '#80d6ff';
-    }
-
-    if (segment === 'night') {
-      return '#6f94ff';
-    }
-
-    return '#9bdcff';
-  }
-
-  private refreshTemperatureChart(): void {
-    const hours = this.forecast24h.map((item) => item.hour);
-    const temperatures = this.forecast24h.map((item) => item.temperature);
-    const accentColor = this.getChartAccentColor(this.getSelectedHourSegment());
-    const chartWidth = hours.length > 0 ? Math.max(340, hours.length * 44) : '100%';
-    const chart = this.chartOptions.chart.width === chartWidth
-      ? this.chartOptions.chart
-      : { ...this.chartOptions.chart, width: chartWidth };
-
-    this.chartOptions = {
-      ...this.chartOptions,
-      chart,
-      series: [{ name: 'Temperatura', data: temperatures }],
-      xaxis: {
-        ...this.chartOptions.xaxis,
-        categories: hours,
-        tickAmount: hours.length > 0 ? hours.length - 1 : undefined
-      },
-      colors: [accentColor],
-      markers: {
-        ...this.chartOptions.markers,
-        discrete: temperatures.length > 0
-          ? [{
-              seriesIndex: 0,
-              dataPointIndex: this.selectedForecastIndex,
-              fillColor: '#ffffff',
-              strokeColor: accentColor,
-              size: 6
-            }]
-          : []
-      }
-    };
   }
 
   private triggerInteractionFeedback(index: number): void {

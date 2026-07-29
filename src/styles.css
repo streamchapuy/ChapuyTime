@@ -307,8 +307,7 @@ app-home .hero-topline {
 	gap: 12px;
 }
 
-app-home .live-pill,
-app-home .hero-chip {
+app-home .live-pill {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -318,31 +317,17 @@ app-home .hero-chip {
 	font-size: 0.7rem;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
-}
-
-app-home .live-pill {
 	background: rgba(255, 255, 255, 0.12);
 	color: rgba(244, 248, 251, 0.96);
 	border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-app-home .weather-badges {
+app-home .weather-time {
 	position: relative;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	justify-content: center;
-	margin-top: 14px;
-}
-
-app-home .hero-chip {
-	background: rgba(255, 255, 255, 0.12);
-	color: rgba(244, 248, 251, 0.92);
-	border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-app-home .hero-chip-soft {
-	background: rgba(255, 255, 255, 0.08);
+	margin: 6px 0 0;
+	font-size: 0.82rem;
+	letter-spacing: 0.08em;
+	opacity: 0.78;
 }
 
 app-home .weather-city {
@@ -413,160 +398,72 @@ app-home .weather-sun::after {
 	transform: rotate(90deg);
 }
 
-app-home .temperature-range-card {
+app-home .weather-condition {
 	position: relative;
-	margin-top: 18px;
-	padding: 14px;
-	border-radius: 20px;
-	background: rgba(255, 255, 255, 0.08);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(10px);
+	margin: 6px 0 0;
+	font-size: 1rem;
+	font-weight: 600;
+	color: rgba(244, 248, 251, 0.92);
 }
 
-app-home .temperature-range-head {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 12px;
-	font-size: 0.62rem;
-	letter-spacing: 0.16em;
-	text-transform: uppercase;
-	opacity: 0.82;
-}
-
-app-home .temperature-range-head strong {
-	font-family: 'Space Grotesk', sans-serif;
+app-home .weather-feels-like {
+	position: relative;
+	margin: 6px 0 0;
 	font-size: 0.86rem;
-	letter-spacing: -0.03em;
-	text-transform: none;
-	opacity: 1;
+	opacity: 0.8;
 }
 
-app-home .temperature-range-graph {
-	margin-top: 12px;
-}
-
-app-home .temperature-range-scale {
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 8px;
-	font-size: 0.62rem;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
-	opacity: 0.82;
-}
-
-app-home .temperature-range-track {
+app-home .weather-divider {
 	position: relative;
-	height: 22px;
-	border-radius: 999px;
-	background: linear-gradient(90deg, #68c3ff 0%, #7ee7c5 36%, #ffe07a 68%, #ff9f72 100%);
-	box-shadow:
-		inset 0 1px 2px rgba(255, 255, 255, 0.24),
-		0 12px 28px rgba(0, 0, 0, 0.2);
+	margin: 16px 0;
+	border: none;
+	border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-app-home .temperature-range-fill {
-	position: absolute;
-	inset: 5px 12px 5px 12px;
-	border-radius: inherit;
-	background: linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.26) 100%);
-	opacity: 0.78;
-}
-
-app-home .temperature-range-marker {
-	position: absolute;
-	top: 50%;
-	left: 0;
-	width: 24px;
-	height: 24px;
-	transform: translate(-50%, -50%);
-	border-radius: 50%;
-	background: #ffffff;
-	border: 4px solid rgba(13, 27, 42, 0.16);
-	box-shadow:
-		0 0 0 6px rgba(255, 255, 255, 0.14),
-		0 10px 20px rgba(0, 0, 0, 0.26);
-}
-
-app-home .temperature-range-labels {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 10px;
-	margin-top: 12px;
+app-home .weather-maxmin-row,
+app-home .weather-uvwind-row {
+	position: relative;
+	display: flex;
+	justify-content: space-around;
+	gap: 12px;
 	text-align: center;
 }
 
-app-home .temperature-range-labels span {
+app-home .weather-stat span {
 	display: block;
-	font-size: 0.58rem;
-	letter-spacing: 0.16em;
-	text-transform: uppercase;
-	opacity: 0.7;
-}
-
-app-home .temperature-range-labels strong {
-	display: block;
-	margin-top: 6px;
-	font-family: 'Space Grotesk', sans-serif;
-	font-size: 1rem;
-	font-weight: 700;
-}
-
-app-home .temperature-range-center {
-	position: relative;
-}
-
-app-home .temperature-range-center::before {
-	content: '';
-	position: absolute;
-	left: -8px;
-	right: -8px;
-	top: -8px;
-	bottom: -8px;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.12);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	z-index: -1;
-}
-
-app-home .weather-quick-stats {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 10px;
-	margin-top: 14px;
-}
-
-app-home .weather-quick-stat {
-	padding: 12px 14px;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.1);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(10px);
-	text-align: left;
-}
-
-app-home .weather-quick-stat span {
-	display: block;
-	font-size: 0.62rem;
-	letter-spacing: 0.16em;
+	font-size: 0.68rem;
+	letter-spacing: 0.1em;
 	text-transform: uppercase;
 	opacity: 0.72;
 }
 
-app-home .weather-quick-stat strong {
+app-home .weather-stat strong {
 	display: block;
 	margin-top: 6px;
 	font-family: 'Space Grotesk', sans-serif;
-	font-size: 1.1rem;
+	font-size: 1.15rem;
 	font-weight: 700;
 }
 
-app-home .weather-quick-stat small {
+app-home .weather-rain-row {
+	position: relative;
+	text-align: center;
+}
+
+app-home .weather-rain-row span {
 	display: block;
-	margin-top: 4px;
-	font-size: 0.72rem;
-	opacity: 0.8;
+	font-size: 0.68rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	opacity: 0.72;
+}
+
+app-home .weather-rain-row strong {
+	display: block;
+	margin-top: 6px;
+	font-family: 'Space Grotesk', sans-serif;
+	font-size: 1.6rem;
+	font-weight: 700;
 }
 
 app-home .details-main {
@@ -616,58 +513,6 @@ app-home .detail-value-hero {
 	letter-spacing: -0.04em;
 }
 
-app-home .wind-row {
-	margin-top: 8px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-}
-
-app-home .wind-row .detail-value {
-	margin: 0;
-}
-
-app-home .wind-direction-icon {
-	position: relative;
-	width: 42px;
-	height: 42px;
-	border-radius: 50%;
-	border: 1px solid rgba(244, 248, 251, 0.32);
-	background: rgba(255, 255, 255, 0.1);
-	flex-shrink: 0;
-	transition: transform 0.35s ease;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-
-app-home .wind-direction-icon::before {
-	content: '';
-	position: absolute;
-	left: 50%;
-	top: 8px;
-	width: 2px;
-	height: 14px;
-	transform: translateX(-50%);
-	background: rgba(244, 248, 251, 0.92);
-}
-
-app-home .wind-direction-icon::after {
-	content: '';
-	position: absolute;
-	left: 50%;
-	top: 4px;
-	transform: translateX(-50%);
-	width: 0;
-	height: 0;
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	border-bottom: 8px solid rgba(244, 248, 251, 0.94);
-}
-
-app-home .wind-direction-icon.no-data {
-	opacity: 0.45;
-}
-
 app-home .detail-subtitle {
 	margin: 4px 0 0;
 	font-size: 1rem;
@@ -685,98 +530,42 @@ app-home .detail-forecast24h {
 	border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-app-home .forecast-summary-row {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 8px;
-	margin-top: 10px;
+app-home .daily-forecast-list {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin-top: 6px;
 }
 
-app-home .forecast-summary-chip {
-	padding: 9px 8px;
-	border-radius: 12px;
-	background: rgba(5, 24, 43, 0.34);
-	border: 1px solid rgba(205, 233, 255, 0.22);
-	text-align: center;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+app-home .daily-forecast-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 10px 4px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-app-home .forecast-summary-chip span {
-	display: block;
-	font-size: 0.56rem;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
-	color: rgba(227, 241, 255, 0.9);
+app-home .daily-forecast-row:last-child {
+	border-bottom: none;
 }
 
-app-home .forecast-summary-chip strong {
-	display: block;
-	margin-top: 4px;
-	font-size: 0.88rem;
+app-home .daily-forecast-day {
+	flex: 1;
+	font-size: 0.86rem;
+	font-weight: 600;
+}
+
+app-home .daily-forecast-temps {
 	font-family: 'Space Grotesk', sans-serif;
-	color: #ffffff;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	font-size: 0.9rem;
+	opacity: 0.9;
 }
 
-app-home .forecast-summary-chip:last-child strong {
-	white-space: normal;
-	line-height: 1.15;
-}
-
-app-home .temperature-chart-card {
-	position: relative;
-	margin-top: 10px;
-	padding: 10px 4px 4px;
-	border-radius: 14px;
-	background: rgba(7, 30, 53, 0.34);
-	border: 1px solid rgba(255, 255, 255, 0.16);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-app-home .temperature-chart {
-	display: block;
-	width: 100%;
-}
-
-app-home .temperature-chart-scroll {
-	overflow-x: auto;
-	overflow-y: hidden;
-	-webkit-overflow-scrolling: touch;
-	scrollbar-width: thin;
-	scrollbar-color: rgba(255, 255, 255, 0.28) rgba(255, 255, 255, 0.08);
-}
-
-app-home .temperature-chart-scroll::-webkit-scrollbar {
-	height: 4px;
-}
-
-app-home .temperature-chart-scroll::-webkit-scrollbar-track {
-	background: rgba(255, 255, 255, 0.08);
-	border-radius: 999px;
-}
-
-app-home .temperature-chart-scroll::-webkit-scrollbar-thumb {
-	background: rgba(255, 255, 255, 0.28);
-	border-radius: 999px;
-}
-
-app-home .temperature-chart .apexcharts-canvas {
-	margin: 0 auto;
-}
-
-app-home .temperature-chart .apexcharts-tooltip {
-	background: rgba(7, 30, 53, 0.92) !important;
-	border: 1px solid rgba(255, 255, 255, 0.16) !important;
-	box-shadow: 0 6px 14px rgba(3, 18, 32, 0.3) !important;
-	color: #f5fbff !important;
-}
-
-app-home .temperature-chart .apexcharts-tooltip-title {
-	background: rgba(255, 255, 255, 0.08) !important;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
-	color: #f5fbff !important;
+app-home .daily-forecast-icon {
+	width: 32px;
+	height: 32px;
+	object-fit: contain;
 }
 
 app-home .chart-empty {
@@ -844,162 +633,6 @@ app-home app-hourly-weather-card {
 	min-height: 112px;
 }
 
-app-home .forecast-detail-backdrop {
-	position: fixed;
-	inset: 0;
-	z-index: 200;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 16px;
-	background: rgba(4, 16, 28, 0.6);
-	backdrop-filter: blur(3px);
-	-webkit-backdrop-filter: blur(3px);
-	animation: forecast-detail-backdrop-fade 180ms ease;
-}
-
-app-home .forecast-detail-card {
-	position: relative;
-	width: 100%;
-	max-width: 360px;
-	max-height: calc(100vh - 32px);
-	max-height: calc(100dvh - 32px);
-	overflow-y: auto;
-	padding: 14px;
-	border-radius: 14px;
-	background:
-		linear-gradient(165deg, rgba(28, 66, 102, 0.98), rgba(10, 34, 58, 0.98));
-	border: 1px solid rgba(255, 255, 255, 0.24);
-	box-shadow: 0 18px 36px rgba(2, 14, 26, 0.55);
-	animation: forecast-detail-fade 200ms ease;
-}
-
-app-home .forecast-detail-close {
-	position: absolute;
-	top: 8px;
-	right: 8px;
-	width: 24px;
-	height: 24px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 50%;
-	border: 1px solid rgba(255, 255, 255, 0.24);
-	background: rgba(255, 255, 255, 0.08);
-	color: rgba(240, 248, 255, 0.9);
-	font-size: 0.68rem;
-	line-height: 1;
-	cursor: pointer;
-}
-
-app-home .forecast-detail-close:hover {
-	background: rgba(255, 255, 255, 0.18);
-}
-
-app-home .forecast-detail-hint {
-	margin: 10px 0 0;
-	padding: 11px;
-	border-radius: 14px;
-	background: rgba(12, 48, 78, 0.2);
-	border: 1px dashed rgba(255, 255, 255, 0.22);
-	text-align: center;
-	font-size: 0.74rem;
-	color: rgba(228, 241, 255, 0.7);
-}
-
-app-home .forecast-detail-top {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 8px;
-}
-
-app-home .forecast-detail-time {
-	margin: 0;
-	font-size: 0.62rem;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: rgba(239, 247, 255, 0.84);
-}
-
-app-home .forecast-detail-condition {
-	margin: 2px 0 0;
-	font-size: 0.72rem;
-	font-weight: 600;
-	color: #f1f8ff;
-}
-
-app-home .forecast-detail-temp {
-	margin: 0;
-	font-family: 'Space Grotesk', sans-serif;
-	font-size: 1.5rem;
-	letter-spacing: -0.04em;
-	color: #ffffff;
-}
-
-app-home .forecast-detail-grid {
-	margin-top: 10px;
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 7px;
-}
-
-app-home .forecast-detail-item {
-	padding: 7px 8px;
-	border-radius: 10px;
-	background: rgba(255, 255, 255, 0.1);
-	border: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-app-home .forecast-detail-item span {
-	display: block;
-	font-size: 0.54rem;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: rgba(233, 245, 255, 0.8);
-}
-
-app-home .forecast-detail-item strong {
-	display: block;
-	margin-top: 3px;
-	font-size: 0.76rem;
-	font-weight: 700;
-	color: #ffffff;
-	line-height: 1.25;
-	white-space: normal;
-	word-break: break-word;
-}
-
-app-home .forecast-detail-risk strong {
-	display: inline-flex;
-	padding: 3px 8px;
-	border-radius: 999px;
-	border: 1px solid transparent;
-	text-transform: uppercase;
-	font-size: 0.64rem;
-	letter-spacing: 0.05em;
-}
-
-@keyframes forecast-detail-fade {
-	from {
-		opacity: 0;
-		transform: translateY(4px) scale(0.98);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0) scale(1);
-	}
-}
-
-@keyframes forecast-detail-backdrop-fade {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
-
 @keyframes hour-chip-tap {
 	0% {
 		transform: translateY(0) scale(1);
@@ -1010,24 +643,6 @@ app-home .forecast-detail-risk strong {
 	100% {
 		transform: translateY(0) scale(1);
 	}
-}
-
-app-home .rain-risk-low {
-	color: #7ef5c4;
-	background: rgba(20, 96, 75, 0.42);
-	border-color: rgba(126, 245, 196, 0.34);
-}
-
-app-home .rain-risk-medium {
-	color: #ffe195;
-	background: rgba(120, 82, 19, 0.44);
-	border-color: rgba(255, 225, 149, 0.34);
-}
-
-app-home .rain-risk-high {
-	color: #ffc2c2;
-	background: rgba(134, 33, 33, 0.44);
-	border-color: rgba(255, 194, 194, 0.34);
 }
 
 app-home .weather-icons-row {
@@ -1253,27 +868,8 @@ app-home .forecast-item strong {
 	font-size: 1rem;
 }
 
-app-home .uv-card {
-	position: relative;
-	overflow: hidden;
-}
-
 app-home .feature-panel {
 	transform: translateZ(0);
-}
-
-app-home .uv-track {
-	margin-top: 8px;
-	height: 5px;
-	border-radius: 999px;
-	background: rgba(0, 0, 0, 0.28);
-}
-
-app-home .uv-fill {
-	display: block;
-	height: 100%;
-	border-radius: inherit;
-	background: linear-gradient(90deg, #00b3ff 0%, #5ad0ff 100%);
 }
 
 app-home .install-cta {
@@ -1356,36 +952,6 @@ app-home .install-button:disabled {
 		font-size: 0.66rem;
 	}
 
-	app-home .forecast-summary-row {
-		display: flex;
-		gap: 6px;
-		overflow-x: auto;
-		padding-bottom: 2px;
-		scrollbar-width: none;
-	}
-
-	app-home .forecast-summary-row::-webkit-scrollbar {
-		display: none;
-	}
-
-	app-home .forecast-summary-chip {
-		flex: 0 0 108px;
-		gap: 7px;
-		padding: 8px 7px;
-	}
-
-	app-home .forecast-summary-chip span {
-		font-size: 0.6rem;
-	}
-
-	app-home .forecast-summary-chip strong {
-		font-size: 0.92rem;
-	}
-
-	app-home .temperature-chart-card {
-		padding: 9px 4px 4px;
-	}
-
 	app-home .hourly-carousel {
 		--hour-gap: 4px;
 		padding-top: 9px;
@@ -1396,33 +962,8 @@ app-home .install-button:disabled {
 		max-width: calc((100% - 12px) / 4);
 		min-height: 118px;
 	}
-
-	app-home .forecast-detail-grid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 6px;
-	}
-
-	app-home .forecast-detail-item {
-		padding: 8px;
-	}
-
-	app-home .forecast-detail-item span {
-		font-size: 0.6rem;
-	}
-
-	app-home .forecast-detail-item strong {
-		font-size: 0.82rem;
-	}
-
-	app-home .forecast-detail-risk strong {
-		font-size: 0.68rem;
-	}
 }
 @media (min-width: 721px) {
-	app-home .forecast-detail-grid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
 	app-home .install-cta {
 		padding: 0 20px 32px;
 	}
@@ -1466,33 +1007,8 @@ app-home .install-button:disabled {
 		font-size: clamp(3rem, 14vw, 4.2rem);
 	}
 
-	app-home .temperature-range-card {
-		padding: 11px;
-	}
-
-	app-home .temperature-range-marker {
-		width: 20px;
-		height: 20px;
-	}
-
 	app-home .detail-forecast24h {
 		padding: 10px 4px;
-	}
-
-	app-home .forecast-summary-chip {
-		flex-basis: 102px;
-	}
-
-	app-home .forecast-detail-grid {
-		grid-template-columns: 1fr;
-	}
-
-	app-home .forecast-detail-item strong {
-		font-size: 0.86rem;
-	}
-
-	app-home .forecast-detail-temp {
-		font-size: 1.35rem;
 	}
 }
 
