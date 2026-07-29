@@ -313,6 +313,7 @@ app-home .live-pill {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	gap: 6px;
 	min-height: 28px;
 	padding: 0 12px;
 	border-radius: 999px;
@@ -322,6 +323,40 @@ app-home .live-pill {
 	background: rgba(255, 255, 255, 0.12);
 	color: rgba(244, 248, 251, 0.96);
 	border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+app-home .live-dot {
+	position: relative;
+	display: inline-flex;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #ff4d4f;
+	box-shadow: 0 0 6px rgba(255, 77, 79, 0.8);
+}
+
+app-home .live-dot::before {
+	content: '';
+	position: absolute;
+	inset: -4px;
+	border-radius: 50%;
+	background: rgba(255, 77, 79, 0.55);
+	animation: live-dot-pulse 1.6s ease-out infinite;
+}
+
+@keyframes live-dot-pulse {
+	0% {
+		transform: scale(0.6);
+		opacity: 0.8;
+	}
+	70% {
+		transform: scale(1.8);
+		opacity: 0;
+	}
+	100% {
+		transform: scale(1.8);
+		opacity: 0;
+	}
 }
 
 app-home .weather-time {
