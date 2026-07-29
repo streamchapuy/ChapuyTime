@@ -302,12 +302,14 @@ app-home .hero-card::before {
 app-home .hero-topline {
 	position: relative;
 	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
+	align-items: flex-start;
+	justify-content: center;
 }
 
 app-home .live-pill {
+	position: absolute;
+	top: 0;
+	right: 0;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -331,11 +333,14 @@ app-home .weather-time {
 }
 
 app-home .weather-city {
-	margin: 10px 0 0;
+	margin: 0;
+	width: 100%;
+	padding: 0 44px;
 	font-family: 'Space Grotesk', sans-serif;
 	font-size: clamp(1.8rem, 6vw, 2.4rem);
 	font-weight: 700;
 	letter-spacing: -0.05em;
+	text-align: center;
 }
 
 app-home .weather-temp-row {
