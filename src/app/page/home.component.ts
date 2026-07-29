@@ -85,6 +85,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   uvIndex: number | null = null;
   forecast24h: HourlyForecast[] = [];
   selectedForecastIndex = 0;
+  isForecastDetailVisible = false;
   activeInteractionIndex: number | null = null;
   selectedTimeFilter: TimeFilterKey = 'all';
   errorMessage = '';
@@ -377,6 +378,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectForecast(index: number): void {
     this.selectedForecastIndex = Math.max(0, Math.min(index, this.forecast24h.length - 1));
+    this.isForecastDetailVisible = true;
     this.triggerInteractionFeedback(this.selectedForecastIndex);
     this.scrollSelectedHourIntoView('smooth');
     this.refreshTemperatureChart();
@@ -555,6 +557,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
               this.uvIndex = weather.uvIndex;
               this.forecast24h = weather.hourly24h;
               this.selectedForecastIndex = 0;
+              this.isForecastDetailVisible = false;
               this.refreshTemperatureChart();
               queueMicrotask(() => {
                 this.scrollSelectedHourIntoView('auto');

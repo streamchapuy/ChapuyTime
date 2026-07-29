@@ -141,7 +141,7 @@
         }
       </div>
 
-      @if (selectedForecast; as selected) {
+      @if (isForecastDetailVisible && selectedForecast; as selected) {
         <article class="forecast-detail-card" [attr.data-hour]="selected.hour">
           <div class="forecast-detail-top">
             <div>
@@ -178,6 +178,8 @@
             </div>
           </div>
         </article>
+      } @else if (forecast24h.length > 0) {
+        <p class="forecast-detail-hint">Toca una tarjeta de hora o el gráfico para ver el detalle.</p>
       }
     </article>
 
