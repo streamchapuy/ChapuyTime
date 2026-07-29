@@ -109,26 +109,26 @@ export class WeatherService {
     48: { label: 'niebla escarchada', iconName: 'fog-day' },
     51: { label: 'llovizna ligera', iconName: 'drizzle' },
     53: { label: 'llovizna', iconName: 'drizzle' },
-    55: { label: 'llovizna intensa', iconName: 'extreme-drizzle' },
+    55: { label: 'llovizna intensa', iconName: 'drizzle' },
     56: { label: 'llovizna helada ligera', iconName: 'sleet' },
     57: { label: 'llovizna helada', iconName: 'sleet' },
     61: { label: 'lluvia ligera', iconName: 'rain' },
     63: { label: 'lluvia', iconName: 'rain' },
-    65: { label: 'lluvia intensa', iconName: 'extreme-rain' },
+    65: { label: 'lluvia intensa', iconName: 'rain' },
     66: { label: 'lluvia helada ligera', iconName: 'sleet' },
     67: { label: 'lluvia helada', iconName: 'sleet' },
     71: { label: 'nieve ligera', iconName: 'snow' },
     73: { label: 'nieve', iconName: 'snow' },
-    75: { label: 'nieve intensa', iconName: 'extreme-snow' },
+    75: { label: 'nieve intensa', iconName: 'snow' },
     77: { label: 'granos de nieve', iconName: 'hail' },
     80: { label: 'chubascos ligeros', iconName: 'rain' },
     81: { label: 'chubascos', iconName: 'rain' },
-    82: { label: 'chubascos intensos', iconName: 'extreme-rain' },
+    82: { label: 'chubascos intensos', iconName: 'rain' },
     85: { label: 'chubascos de nieve', iconName: 'snow' },
-    86: { label: 'chubascos de nieve intensos', iconName: 'extreme-snow' },
+    86: { label: 'chubascos de nieve intensos', iconName: 'snow' },
     95: { label: 'tormenta', iconName: 'thunderstorms-rain' },
-    96: { label: 'tormenta con granizo', iconName: 'thunderstorms-extreme-rain' },
-    99: { label: 'tormenta fuerte con granizo', iconName: 'thunderstorms-extreme-rain' }
+    96: { label: 'tormenta con granizo', iconName: 'thunderstorms-rain' },
+    99: { label: 'tormenta fuerte con granizo', iconName: 'thunderstorms-rain' }
   };
 
   getCurrentWeather(lat: number, lon: number): Observable<WeatherSnapshot> {
