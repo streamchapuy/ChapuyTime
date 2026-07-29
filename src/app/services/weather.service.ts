@@ -19,6 +19,7 @@ interface OpenMeteoForecastResponse {
   hourly?: {
     time?: string[];
     temperature_2m?: number[];
+    apparent_temperature?: number[];
     relative_humidity_2m?: number[];
     weather_code?: number[];
     wind_speed_10m?: number[];
@@ -32,6 +33,8 @@ interface OpenMeteoForecastResponse {
     temperature_2m_min?: number[];
     weather_code?: number[];
     precipitation_probability_max?: number[];
+    sunrise?: string[];
+    sunset?: string[];
   };
 }
 
@@ -62,12 +65,19 @@ interface NominatimReverseGeocodingResponse {
 export interface HourlyForecast {
   hour: string;
   temperature: number;
+  feelsLike: number | null;
   iconUrl: string | null;
   condition: string;
   humidity: number | null;
   windSpeed: number | null;
   rainProbability: number | null;
   rainMillimeters: number | null;
+}
+
+export interface SunEvent {
+  index: number;
+  time: string;
+  type: 'sunrise' | 'sunset';
 }
 
 export interface DailyForecast {
@@ -95,6 +105,7 @@ export interface WeatherSnapshot {
   currentTimeLabel: string;
   hourly24h: HourlyForecast[];
   dailyForecast: DailyForecast[];
+  sunEvents: SunEvent[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -137,8 +148,8 @@ export class WeatherService {
       .set('longitude', lon)
       .set('timezone', 'auto')
       .set('current', 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day')
-      .set('hourly', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation_probability,precipitation,is_day')
-      .set('daily', 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max')
+      .set('hourly', 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,precipitation_probability,precipitation,is_day')
+      .set('daily', 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset')
       .set('forecast_days', '7');
 
     const reverseParams = new HttpParams()
@@ -161,6 +172,7 @@ export class WeatherService {
         const currentTime = current?.time ?? null;
         const hourly24h = this.buildHourlyForecast(forecast, currentTime);
         const dailyForecast = this.buildDailyForecast(forecast);
+        const sunEvents = this.buildSunEvents(forecast, currentTime);
         const currentDescriptor = this.getWeatherDescriptor(current?.weather_code, current?.is_day);
 
         return {
@@ -179,7 +191,8 @@ export class WeatherService {
           rainProbabilityToday: forecast.daily?.precipitation_probability_max?.[0] ?? null,
           currentTimeLabel: this.getTimeLabel(currentTime),
           hourly24h,
-          dailyForecast
+          dailyForecast,
+          sunEvents
         };
       })
     );
@@ -203,6 +216,9 @@ export class WeatherService {
       return {
         hour: this.getHourLabel(time),
         temperature: this.toRoundedValue(forecast.hourly?.temperature_2m?.[absoluteIndex]),
+        feelsLike: forecast.hourly?.apparent_temperature?.[absoluteIndex] !== undefined
+          ? this.toRoundedValue(forecast.hourly?.apparent_temperature?.[absoluteIndex])
+          : null,
         iconUrl: this.getIconUrl(weatherDescriptor.iconName),
         condition: weatherDescriptor.label,
         humidity: forecast.hourly?.relative_humidity_2m?.[absoluteIndex] ?? null,
@@ -211,6 +227,54 @@ export class WeatherService {
         rainMillimeters: this.toNullableDecimal(forecast.hourly?.precipitation?.[absoluteIndex])
       };
     });
+  }
+
+  private buildSunEvents(forecast: OpenMeteoForecastResponse, currentTime: string | null): SunEvent[] {
+    const times = forecast.hourly?.time ?? [];
+    const startIndex = currentTime ? Math.max(0, times.findIndex((time) => time >= currentTime)) : 0;
+    const windowTimes = times.slice(startIndex, startIndex + 24);
+
+    const events: SunEvent[] = [];
+    const sunrises = forecast.daily?.sunrise ?? [];
+    const sunsets = forecast.daily?.sunset ?? [];
+
+    [...sunrises.map((time) => ({ time, type: 'sunrise' as const })), ...sunsets.map((time) => ({ time, type: 'sunset' as const }))]
+      .forEach(({ time, type }) => {
+        const nearestIndex = this.findNearestHourIndex(windowTimes, time);
+
+        if (nearestIndex !== null) {
+          events.push({ index: nearestIndex, time: this.getTimeLabel(time), type });
+        }
+      });
+
+    return events.sort((a, b) => a.index - b.index);
+  }
+
+  private findNearestHourIndex(windowTimes: string[], targetTime: string): number | null {
+    if (windowTimes.length === 0) {
+      return null;
+    }
+
+    const target = new Date(targetTime).getTime();
+
+    if (Number.isNaN(target)) {
+      return null;
+    }
+
+    let closestIndex: number | null = null;
+    let closestDiff = Infinity;
+
+    windowTimes.forEach((time, index) => {
+      const diff = Math.abs(new Date(time).getTime() - target);
+
+      if (diff < closestDiff) {
+        closestDiff = diff;
+        closestIndex = index;
+      }
+    });
+
+    // Solo se muestra el evento si cae dentro de la ventana de 24hs (a menos de 1.5hs del extremo).
+    return closestDiff <= 90 * 60 * 1000 ? closestIndex : null;
   }
 
   private toRoundedValue(value: number | undefined): number {

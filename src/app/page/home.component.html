@@ -72,6 +72,15 @@
     <article class="detail-card detail-forecast24h glass-card feature-panel">
       <div class="panel-head">
         <h3>Pronóstico por horas</h3>
+        <label class="feels-like-toggle">
+          <span>Sensación térmica</span>
+          <input
+            type="checkbox"
+            [checked]="showFeelsLikeInChart"
+            (change)="toggleFeelsLikeInChart()"
+          />
+          <span class="toggle-track" aria-hidden="true"></span>
+        </label>
       </div>
 
       <div #hourlyCarousel class="hourly-carousel" aria-label="Carrusel de horas">
@@ -86,7 +95,39 @@
         }
       </div>
 
-      @if (forecast24h.length === 0) {
+      @if (forecast24h.length > 0) {
+        <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
+          <div class="temperature-chart-scroll" (pointermove)="onChartPointerMove($event)">
+            <apx-chart
+              class="temperature-chart"
+              [series]="chartOptions.series"
+              [chart]="chartOptions.chart"
+              [xaxis]="chartOptions.xaxis"
+              [yaxis]="chartOptions.yaxis"
+              [stroke]="chartOptions.stroke"
+              [fill]="chartOptions.fill"
+              [dataLabels]="chartOptions.dataLabels"
+              [markers]="chartOptions.markers"
+              [grid]="chartOptions.grid"
+              [tooltip]="chartOptions.tooltip"
+              [colors]="chartOptions.colors"
+              [annotations]="chartOptions.annotations"
+            ></apx-chart>
+          </div>
+
+          <div class="precip-bar-row" aria-label="Probabilidad de lluvia por bloque horario">
+            @for (block of precipitationBlocks; track block.label) {
+              <div class="precip-bar-col">
+                <span class="precip-bar-value">{{ block.probability }}%</span>
+                <div class="precip-bar" [class.precip-bar-empty]="block.probability === 0">
+                  <span class="precip-bar-fill" [style.height.%]="block.heightPercent"></span>
+                </div>
+                <span class="precip-bar-label">{{ block.label }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
         <p class="chart-empty">Sin datos para mostrar.</p>
       }
     </article>
