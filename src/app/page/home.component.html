@@ -139,48 +139,6 @@
         } @else {
           <p class="chart-empty">Sin datos para graficar.</p>
         }
-
-        @if (isForecastDetailVisible && selectedForecast; as selected) {
-          <div class="forecast-detail-backdrop" (click)="closeForecastDetail()">
-            <article class="forecast-detail-card" [attr.data-hour]="selected.hour" (click)="$event.stopPropagation()">
-              <button type="button" class="forecast-detail-close" (click)="closeForecastDetail()" aria-label="Cerrar detalle">✕</button>
-              <div class="forecast-detail-top">
-                <div>
-                  <p class="forecast-detail-time">{{ selected.hour }}</p>
-                  <p class="forecast-detail-condition">{{ selected.condition }}</p>
-                </div>
-                <p class="forecast-detail-temp">{{ selected.temperature }}°</p>
-              </div>
-
-              <div class="forecast-detail-grid">
-                <div class="forecast-detail-item">
-                  <span>Sensacion</span>
-                  <strong>{{ getEstimatedFeelsLike(selected) !== null ? getEstimatedFeelsLike(selected) + '°' : '--' }}</strong>
-                </div>
-                <div class="forecast-detail-item">
-                  <span>Humedad</span>
-                  <strong>{{ selected.humidity !== null ? selected.humidity + '%' : '--' }}</strong>
-                </div>
-                <div class="forecast-detail-item">
-                  <span>Viento</span>
-                  <strong>{{ selected.windSpeed !== null ? selected.windSpeed + ' km/h' : '--' }} {{ windDirection ?? '--' }}</strong>
-                </div>
-                <div class="forecast-detail-item">
-                  <span>Lluvia</span>
-                  <strong>{{ selected.rainProbability !== null ? selected.rainProbability + '%' : '--' }} · {{ selected.rainMillimeters !== null ? selected.rainMillimeters + ' mm' : '--' }}</strong>
-                </div>
-                <div class="forecast-detail-item forecast-detail-risk">
-                  <span>Riesgo</span>
-                  <strong [class]="getRainRiskClass(selected.rainProbability)">{{ getRainRiskLabel(selected.rainProbability) }}</strong>
-                </div>
-                <div class="forecast-detail-item">
-                  <span>UV est.</span>
-                  <strong>{{ getEstimatedUvForHour(selected) !== null ? getEstimatedUvForHour(selected) : '--' }}</strong>
-                </div>
-              </div>
-            </article>
-          </div>
-        }
       </div>
 
       @if (!isForecastDetailVisible && forecast24h.length > 0) {
@@ -246,6 +204,48 @@
       }
     </article>
   </section>
+
+  @if (isForecastDetailVisible && selectedForecast; as selected) {
+    <div class="forecast-detail-backdrop" (click)="closeForecastDetail()">
+      <article class="forecast-detail-card" [attr.data-hour]="selected.hour" (click)="$event.stopPropagation()">
+        <button type="button" class="forecast-detail-close" (click)="closeForecastDetail()" aria-label="Cerrar detalle">✕</button>
+        <div class="forecast-detail-top">
+          <div>
+            <p class="forecast-detail-time">{{ selected.hour }}</p>
+            <p class="forecast-detail-condition">{{ selected.condition }}</p>
+          </div>
+          <p class="forecast-detail-temp">{{ selected.temperature }}°</p>
+        </div>
+
+        <div class="forecast-detail-grid">
+          <div class="forecast-detail-item">
+            <span>Sensacion</span>
+            <strong>{{ getEstimatedFeelsLike(selected) !== null ? getEstimatedFeelsLike(selected) + '°' : '--' }}</strong>
+          </div>
+          <div class="forecast-detail-item">
+            <span>Humedad</span>
+            <strong>{{ selected.humidity !== null ? selected.humidity + '%' : '--' }}</strong>
+          </div>
+          <div class="forecast-detail-item">
+            <span>Viento</span>
+            <strong>{{ selected.windSpeed !== null ? selected.windSpeed + ' km/h' : '--' }} {{ windDirection ?? '--' }}</strong>
+          </div>
+          <div class="forecast-detail-item">
+            <span>Lluvia</span>
+            <strong>{{ selected.rainProbability !== null ? selected.rainProbability + '%' : '--' }} · {{ selected.rainMillimeters !== null ? selected.rainMillimeters + ' mm' : '--' }}</strong>
+          </div>
+          <div class="forecast-detail-item forecast-detail-risk">
+            <span>Riesgo</span>
+            <strong [class]="getRainRiskClass(selected.rainProbability)">{{ getRainRiskLabel(selected.rainProbability) }}</strong>
+          </div>
+          <div class="forecast-detail-item">
+            <span>UV est.</span>
+            <strong>{{ getEstimatedUvForHour(selected) !== null ? getEstimatedUvForHour(selected) : '--' }}</strong>
+          </div>
+        </div>
+      </article>
+    </div>
+  }
 
   @if (isInstallPromptVisible) {
     <section class="install-cta shell" aria-label="Instalar aplicacion">
