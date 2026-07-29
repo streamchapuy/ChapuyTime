@@ -392,6 +392,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.refreshTemperatureChart();
   }
 
+  closeForecastDetail(): void {
+    this.isForecastDetailVisible = false;
+  }
+
   private previewForecastFromChart(index: number): void {
     if (this.forecast24h.length === 0) {
       return;

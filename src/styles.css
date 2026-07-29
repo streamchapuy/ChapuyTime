@@ -844,20 +844,54 @@ app-home app-hourly-weather-card {
 	min-height: 112px;
 }
 
-app-home .forecast-detail-card {
+app-home .forecast-detail-backdrop {
 	position: absolute;
-	top: 100%;
-	left: 5px;
-	right: 5px;
+	inset: 0;
 	z-index: 40;
-	margin-top: 8px;
-	padding: 11px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	border-radius: 14px;
+	background: rgba(4, 16, 28, 0.55);
+	backdrop-filter: blur(3px);
+	-webkit-backdrop-filter: blur(3px);
+	animation: forecast-detail-backdrop-fade 180ms ease;
+}
+
+app-home .forecast-detail-card {
+	position: relative;
+	width: 100%;
+	max-width: 360px;
+	padding: 14px;
 	border-radius: 14px;
 	background:
 		linear-gradient(165deg, rgba(28, 66, 102, 0.98), rgba(10, 34, 58, 0.98));
 	border: 1px solid rgba(255, 255, 255, 0.24);
-	box-shadow: 0 18px 36px rgba(2, 14, 26, 0.45);
+	box-shadow: 0 18px 36px rgba(2, 14, 26, 0.55);
 	animation: forecast-detail-fade 200ms ease;
+}
+
+app-home .forecast-detail-close {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	border: 1px solid rgba(255, 255, 255, 0.24);
+	background: rgba(255, 255, 255, 0.08);
+	color: rgba(240, 248, 255, 0.9);
+	font-size: 0.68rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+app-home .forecast-detail-close:hover {
+	background: rgba(255, 255, 255, 0.18);
 }
 
 app-home .forecast-detail-hint {
@@ -947,11 +981,20 @@ app-home .forecast-detail-risk strong {
 @keyframes forecast-detail-fade {
 	from {
 		opacity: 0;
-		transform: translateY(4px);
+		transform: translateY(4px) scale(0.98);
 	}
 	to {
 		opacity: 1;
-		transform: translateY(0);
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes forecast-detail-backdrop-fade {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
 	}
 }
 
