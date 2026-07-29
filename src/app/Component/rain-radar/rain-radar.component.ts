@@ -1,5 +1,16 @@
+import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  ViewChild,
+  inject
+} from '@angular/core';
 import * as L from 'leaflet';
 
 interface RainViewerFrame {
@@ -26,6 +37,8 @@ const FRAME_INTERVAL_MS = 800;
 })
 export class RainRadarComponent implements OnChanges, OnDestroy {
   private readonly http = inject(HttpClient);
+  private readonly document = inject(DOCUMENT);
+  private readonly hostRef = inject(ElementRef<HTMLElement>);
 
   @Input() latitude: number | null = null;
   @Input() longitude: number | null = null;
@@ -34,6 +47,7 @@ export class RainRadarComponent implements OnChanges, OnDestroy {
 
   isLoading = true;
   isPlaying = false;
+  isExpanded = false;
   errorMessage = '';
   frameTimeLabel = '';
 
@@ -44,6 +58,8 @@ export class RainRadarComponent implements OnChanges, OnDestroy {
   private frames: RainViewerFrame[] = [];
   private frameIndex = 0;
   private playbackTimer: ReturnType<typeof setInterval> | null = null;
+  private originalParent: Node | null = null;
+  private originalNextSibling: Node | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {
     const hasCoords = this.latitude !== null && this.longitude !== null;
@@ -66,8 +82,26 @@ export class RainRadarComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopPlayback();
+    this.restoreOriginalPosition();
+    this.setBodyScrollLocked(false);
     this.map?.remove();
     this.map = null;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapePressed(): void {
+    if (this.isExpanded) {
+      this.setExpanded(false);
+    }
+  }
+
+  @HostListener('document:fullscreenchange')
+  onFullscreenChange(): void {
+    const isBrowserFullscreen = !!this.document.fullscreenElement;
+
+    if (!isBrowserFullscreen && this.isExpanded) {
+      this.setExpanded(false);
+    }
   }
 
   togglePlayback(): void {
@@ -78,6 +112,44 @@ export class RainRadarComponent implements OnChanges, OnDestroy {
     this.isPlaying ? this.stopPlayback() : this.startPlayback();
   }
 
+  toggleExpand(): void {
+    this.setExpanded(!this.isExpanded);
+  }
+
+  private setExpanded(expanded: boolean): void {
+    this.isExpanded = expanded;
+    const hostElement = this.hostRef.nativeElement;
+
+    if (expanded) {
+      this.originalParent = hostElement.parentNode;
+      this.originalNextSibling = hostElement.nextSibling;
+      this.document.body.appendChild(hostElement);
+      hostElement.requestFullscreen?.().catch(() => {
+        // Si la API de Fullscreen no está disponible o es rechazada, seguimos con el overlay CSS.
+      });
+    } else {
+      if (this.document.fullscreenElement === hostElement) {
+        this.document.exitFullscreen?.().catch(() => {});
+      }
+      this.restoreOriginalPosition();
+    }
+
+    this.setBodyScrollLocked(expanded);
+    setTimeout(() => this.map?.invalidateSize(), 150);
+  }
+
+  private restoreOriginalPosition(): void {
+    const hostElement = this.hostRef.nativeElement;
+
+    if (this.originalParent && hostElement.parentNode === this.document.body) {
+      this.originalParent.insertBefore(hostElement, this.originalNextSibling);
+    }
+  }
+
+  private setBodyScrollLocked(locked: boolean): void {
+    this.document.body.style.overflow = locked ? 'hidden' : '';
+  }
+
   private initMap(lat: number, lon: number): void {
     const map = L.map(this.radarMapRef.nativeElement, {
       zoomControl: false,
@@ -86,17 +158,17 @@ export class RainRadarComponent implements OnChanges, OnDestroy {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap &copy; CARTO',
       maxZoom: 19
     }).addTo(map);
 
     this.locationMarker = L.circleMarker([lat, lon], {
-      radius: 6,
-      color: '#9bdcff',
+      radius: 7,
+      color: '#ffffff',
       weight: 2,
-      fillColor: '#9bdcff',
-      fillOpacity: 0.85
+      fillColor: '#ff5a36',
+      fillOpacity: 0.95
     }).addTo(map);
 
     this.map = map;
@@ -139,7 +211,7 @@ export class RainRadarComponent implements OnChanges, OnDestroy {
     const tileUrl = `${this.radarHost}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`;
 
     const nextLayer = L.tileLayer(tileUrl, {
-      opacity: 0.65,
+      opacity: 0.75,
       zIndex: 5
     });
 

@@ -1,5 +1,14 @@
-<div class="rain-radar">
+<div class="rain-radar" [class.is-expanded]="isExpanded">
   <div #radarMap class="rain-radar-map" role="img" aria-label="Mapa de radar de lluvia"></div>
+
+  <button
+    type="button"
+    class="rain-radar-expand-btn"
+    (click)="toggleExpand()"
+    [attr.aria-label]="isExpanded ? 'Salir de pantalla completa' : 'Ver en pantalla completa'"
+  >
+    {{ isExpanded ? '✕' : '⛶' }}
+  </button>
 
   @if (isLoading) {
     <div class="rain-radar-overlay">
