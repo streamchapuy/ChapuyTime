@@ -308,21 +308,11 @@ app-home .hero-topline {
 
 app-home .live-pill {
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: 4px;
+	right: 4px;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 6px;
-	min-height: 28px;
-	padding: 0 12px;
-	border-radius: 999px;
-	font-size: 0.7rem;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
-	background: rgba(255, 255, 255, 0.12);
-	color: rgba(244, 248, 251, 0.96);
-	border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 app-home .live-dot {
