@@ -2,7 +2,7 @@ const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
 
-const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+const sizes = [24, 72, 96, 128, 144, 152, 192, 384, 512];
 const logoPath = path.join(__dirname, 'public', 'logo-base.png');
 const iconDir = path.join(__dirname, 'public', 'icons');
 
