@@ -1,7 +1,7 @@
 <app-header [title]="title"></app-header>
 
 <main class="page" [class]="'page ' + weatherThemeClass">
-  <section class="weather-main shell" aria-label="Clima actual">
+  <section id="inicio" class="weather-main shell" aria-label="Clima actual">
     <article class="weather-card hero-card">
       <div class="hero-topline">
         <h2 class="weather-city">{{ currentLocation }}</h2>
@@ -68,7 +68,7 @@
     </article>
   </section>
 
-  <section class="details-main shell" aria-label="Detalle de clima">
+  <section id="pronostico" class="details-main shell" aria-label="Detalle de clima">
     <article class="detail-card detail-forecast24h glass-card feature-panel">
       <div class="panel-head">
         <h3>Pronóstico por horas</h3>
@@ -113,7 +113,7 @@
       }
     </article>
 
-    <article class="detail-card glass-card feature-panel radar-card">
+    <article id="radar" class="detail-card glass-card feature-panel radar-card">
       <div class="panel-head">
         <h3>Radar de lluvia</h3>
         <span>{{ latitude !== null && longitude !== null ? 'En vivo' : 'Sin ubicacion' }}</span>
@@ -147,3 +147,5 @@
     </section>
   }
 </main>
+
+<app-footer></app-footer>

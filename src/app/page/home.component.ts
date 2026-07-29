@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 
+import { FooterComponent } from '../Component/footer/footer.component';
 import { HeaderComponent } from '../Component/header/header.component';
 import { HourlyWeatherCardComponent } from '../Component/hourly-weather-card/hourly-weather-card.component';
 import { RainRadarComponent } from '../Component/rain-radar/rain-radar.component';
@@ -31,7 +32,7 @@ type TimeFilterKey = 'all' | 'morning' | 'afternoon' | 'night';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [HeaderComponent, HourlyWeatherCardComponent, RainRadarComponent],
+  imports: [FooterComponent, HeaderComponent, HourlyWeatherCardComponent, RainRadarComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })

@@ -1,0 +1,142 @@
+:host {
+  display: block;
+}
+
+.app-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 4px;
+  padding: 10px calc(12px + env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px))
+    calc(12px + env(safe-area-inset-left, 0px));
+  background: linear-gradient(0deg, rgba(7, 18, 31, 0.92) 0%, rgba(11, 51, 87, 0.82) 55%, rgba(12, 76, 125, 0.7) 100%);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 -12px 32px rgba(4, 16, 28, 0.24);
+}
+
+.footer-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  padding: 6px 4px;
+  border-radius: 16px;
+  color: rgba(244, 247, 251, 0.68);
+  text-decoration: none;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.footer-link:hover,
+.footer-link:focus-visible,
+.footer-link:active {
+  color: #f4f7fb;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.footer-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.footer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 18px;
+}
+
+/* Inicio: casita */
+.footer-icon-home {
+  position: relative;
+  width: 18px;
+  height: 14px;
+  margin-top: 4px;
+}
+
+.footer-icon-home::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 8px solid currentColor;
+}
+
+.footer-icon-home::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: 14px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-top: 0;
+  border-radius: 0 0 2px 2px;
+  box-sizing: border-box;
+}
+
+/* Pronostico: barras */
+.footer-icon-forecast {
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.footer-icon-forecast span {
+  display: block;
+  width: 4px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.footer-icon-forecast span:nth-child(1) {
+  height: 8px;
+}
+
+.footer-icon-forecast span:nth-child(2) {
+  height: 14px;
+}
+
+.footer-icon-forecast span:nth-child(3) {
+  height: 18px;
+}
+
+/* Radar: circulos concentricos */
+.footer-icon-radar {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+}
+
+.footer-icon-radar::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0.7;
+}
+
+.footer-icon-radar::after {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
