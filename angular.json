@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ChapuyTime": {
+    "Nimbus": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -71,10 +71,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ChapuyTime:build:production"
+              "buildTarget": "Nimbus:build:production"
             },
             "development": {
-              "buildTarget": "ChapuyTime:build:development"
+              "buildTarget": "Nimbus:build:development"
             }
           },
           "defaultConfiguration": "development"
