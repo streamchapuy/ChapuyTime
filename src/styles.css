@@ -714,6 +714,34 @@ app-home .temperature-chart .apexcharts-tooltip-title {
 	color: #f5fbff !important;
 }
 
+app-home .chart-tooltip {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding: 6px 12px;
+	font-family: 'Space Grotesk', sans-serif;
+}
+
+app-home .chart-tooltip-hour {
+	font-size: 0.66rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: rgba(228, 241, 255, 0.7);
+}
+
+app-home .chart-tooltip-temp {
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: #f5fbff;
+}
+
+app-home .chart-tooltip-rain {
+	font-size: 0.68rem;
+	font-weight: 600;
+	color: #7fd0ff;
+}
+
 app-home .precip-bar-row {
 	display: flex;
 	align-items: flex-start;

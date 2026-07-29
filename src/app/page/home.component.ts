@@ -183,10 +183,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     },
     tooltip: {
       theme: 'dark',
-      x: { show: true },
-      y: {
-        formatter: (value: number) => `${Math.round(value)}\u00b0C`
-      }
+      custom: ({ dataPointIndex }: { dataPointIndex: number }) => this.buildChartTooltip(dataPointIndex)
     },
     colors: ['#9bdcff'],
     annotations: { points: [] }
@@ -586,6 +583,25 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     return '#9bdcff';
+  }
+
+  private buildChartTooltip(dataPointIndex: number): string {
+    const item = this.forecast24h[dataPointIndex];
+
+    if (!item) {
+      return '';
+    }
+
+    const temperature = this.showFeelsLikeInChart ? item.feelsLike ?? item.temperature : item.temperature;
+    const rainMillimeters = item.rainMillimeters ?? 0;
+
+    return `
+      <div class="chart-tooltip">
+        <span class="chart-tooltip-hour">${item.hour}</span>
+        <span class="chart-tooltip-temp">${Math.round(temperature)}&deg;</span>
+        <span class="chart-tooltip-rain">${rainMillimeters.toFixed(1)} mm</span>
+      </div>
+    `;
   }
 
   private buildSunAnnotationPoints(hours: string[], temperatures: number[]): NonNullable<ApexAnnotations['points']> {
