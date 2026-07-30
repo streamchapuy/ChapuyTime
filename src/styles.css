@@ -620,34 +620,42 @@ app-home .daily-details-button:focus-visible {
 	border-color: rgba(255, 255, 255, 0.4);
 }
 
-app-home .details-tabs {
-	display: flex;
-	gap: 8px;
-	grid-column: 1 / -1;
-	padding: 4px;
-	border-radius: 16px;
-	background: rgba(229, 240, 252, 0.1);
-	border: 1px solid rgba(244, 248, 251, 0.14);
-}
-
-app-home .details-tab {
-	flex: 1;
-	padding: 10px 12px;
-	border: none;
-	border-radius: 12px;
-	background: transparent;
-	color: rgba(244, 248, 251, 0.72);
-	font-size: 0.76rem;
-	font-weight: 600;
-	letter-spacing: 0.02em;
-	cursor: pointer;
-	transition: background-color 0.2s ease, color 0.2s ease;
-}
-
 app-home .details-tab.is-active {
 	background: rgba(255, 255, 255, 0.18);
 	color: #f4f8fb;
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+app-home .radar-entry-card {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	text-align: left;
+	cursor: pointer;
+	font: inherit;
+	color: #f4f8fb;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+app-home .radar-entry-card:hover,
+app-home .radar-entry-card:focus-visible {
+	background: rgba(229, 240, 252, 0.2);
+	border-color: rgba(244, 248, 251, 0.28);
+}
+
+app-home .radar-entry-copy {
+	margin: 4px 0 0;
+	font-size: 0.8rem;
+	color: rgba(244, 248, 251, 0.78);
+}
+
+app-home .radar-entry-cta {
+	margin-top: 4px;
+	font-size: 0.76rem;
+	font-weight: 600;
+	color: #9bdcff;
 }
 
 app-home .chart-empty {
@@ -657,6 +665,7 @@ app-home .chart-empty {
 	font-size: 0.78rem;
 	color: rgba(228, 241, 255, 0.7);
 }
+
 
 app-home .feels-like-toggle {
 	display: inline-flex;
@@ -1998,5 +2007,63 @@ app-home .daily-details-stat dd {
 	font-size: 0.78rem;
 	font-weight: 600;
 	text-align: right;
+}
+
+app-home .radar-page {
+	position: fixed;
+	inset: 0;
+	z-index: 1500;
+	display: flex;
+	flex-direction: column;
+	background: #071624;
+}
+
+app-home .radar-page-header {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 14px;
+	background: linear-gradient(180deg, rgba(7, 18, 31, 0.95) 0%, rgba(11, 51, 87, 0.85) 100%);
+	box-shadow: 0 8px 24px rgba(4, 16, 28, 0.28);
+}
+
+app-home .radar-page-header h2 {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #f4f8fb;
+}
+
+app-home .radar-page-back {
+	flex-shrink: 0;
+	border: 1px solid rgba(244, 248, 251, 0.24);
+	border-radius: 12px;
+	padding: 8px 12px;
+	background: rgba(255, 255, 255, 0.1);
+	color: #f4f8fb;
+	font-size: 0.8rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+app-home .radar-page-back:hover,
+app-home .radar-page-back:focus-visible {
+	background: rgba(255, 255, 255, 0.18);
+	border-color: rgba(255, 255, 255, 0.4);
+}
+
+app-home .radar-page-content {
+	flex: 1;
+	display: flex;
+	min-height: 0;
+	padding: 12px;
+}
+
+app-home .radar-page-content app-rain-radar {
+	display: flex;
+	flex: 1;
+	min-height: 0;
 }
 

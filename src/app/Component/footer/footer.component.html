@@ -4,7 +4,7 @@
     <span class="footer-label">Inicio</span>
   </a>
 
-  <a class="footer-link" href="#pronostico" (click)="forecastTabRequested.emit()">
+  <a class="footer-link" href="#pronostico">
     <span class="footer-icon footer-icon-forecast" aria-hidden="true">
       <span></span>
       <span></span>
@@ -13,8 +13,8 @@
     <span class="footer-label">Pronostico</span>
   </a>
 
-  <a class="footer-link" href="#radar" (click)="radarTabRequested.emit()">
+  <button class="footer-link" type="button" (click)="radarPageRequested.emit()">
     <span class="footer-icon footer-icon-radar" aria-hidden="true"></span>
     <span class="footer-label">Radar</span>
-  </a>
+  </button>
 </footer>

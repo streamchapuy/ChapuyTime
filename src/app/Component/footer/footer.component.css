@@ -36,6 +36,13 @@
   transition: color 0.2s ease, background-color 0.2s ease;
 }
 
+button.footer-link {
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
 .footer-link:hover,
 .footer-link:focus-visible,
 .footer-link:active {

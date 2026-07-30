@@ -1,4 +1,4 @@
-<div class="rain-radar" [class.is-expanded]="isExpanded">
+<div class="rain-radar" [class.is-expanded]="isExpanded" [class.rain-radar--fill]="fillHeight && !isExpanded">
   <div #radarMap class="rain-radar-map" role="img" aria-label="Mapa de radar de lluvia"></div>
 
   <button

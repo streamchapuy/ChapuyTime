@@ -42,7 +42,6 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 type TimeFilterKey = 'all' | 'morning' | 'afternoon' | 'night';
-type DetailsTabKey = 'pronostico' | 'radar';
 
 interface TemperatureChartOptions {
   series: ApexAxisChartSeries;
@@ -103,8 +102,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedForecastIndex = 0;
   activeInteractionIndex: number | null = null;
   selectedTimeFilter: TimeFilterKey = 'all';
-  activeDetailsTab: DetailsTabKey = 'pronostico';
   isDailyDetailsOpen = false;
+  isRadarPageOpen = false;
   errorMessage = '';
   isLoading = true;
   canInstallApp = false;
@@ -360,10 +359,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedTimeFilter = filter;
   }
 
-  setDetailsTab(tab: DetailsTabKey): void {
-    this.activeDetailsTab = tab;
-  }
-
   openDailyDetails(): void {
     this.isDailyDetailsOpen = true;
   }
@@ -372,8 +367,21 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isDailyDetailsOpen = false;
   }
 
+  openRadarPage(): void {
+    this.isRadarPageOpen = true;
+  }
+
+  closeRadarPage(): void {
+    this.isRadarPageOpen = false;
+  }
+
   @HostListener('document:keydown.escape')
   onEscapeKeydown(): void {
+    if (this.isRadarPageOpen) {
+      this.closeRadarPage();
+      return;
+    }
+
     if (this.isDailyDetailsOpen) {
       this.closeDailyDetails();
     }

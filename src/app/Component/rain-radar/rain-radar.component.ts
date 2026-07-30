@@ -42,6 +42,7 @@ export class RainRadarComponent implements OnChanges, OnDestroy {
 
   @Input() latitude: number | null = null;
   @Input() longitude: number | null = null;
+  @Input() fillHeight = false;
 
   @ViewChild('radarMap', { static: true }) private radarMapRef!: ElementRef<HTMLDivElement>;
 

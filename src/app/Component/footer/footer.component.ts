@@ -7,6 +7,5 @@ import { Component, EventEmitter, Output } from '@angular/core';
   styleUrls: ['./footer.component.css']
 })
 export class FooterComponent {
-  @Output() forecastTabRequested = new EventEmitter<void>();
-  @Output() radarTabRequested = new EventEmitter<void>();
+  @Output() radarPageRequested = new EventEmitter<void>();
 }

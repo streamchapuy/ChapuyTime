@@ -69,140 +69,103 @@
   </section>
 
   <section id="pronostico" class="details-main shell" aria-label="Detalle de clima">
-    <div class="details-tabs" role="tablist" aria-label="Secciones del pronostico">
-      <button
-        type="button"
-        role="tab"
-        class="details-tab"
-        [class.is-active]="activeDetailsTab === 'pronostico'"
-        [attr.aria-selected]="activeDetailsTab === 'pronostico'"
-        (click)="setDetailsTab('pronostico')"
-      >
-        Pronóstico
-      </button>
-      <button
-        id="radar"
-        type="button"
-        role="tab"
-        class="details-tab"
-        [class.is-active]="activeDetailsTab === 'radar'"
-        [attr.aria-selected]="activeDetailsTab === 'radar'"
-        (click)="setDetailsTab('radar')"
-      >
-        Radar de lluvia
-      </button>
-    </div>
+    <article class="detail-card detail-forecast24h glass-card feature-panel">
+      <div class="panel-head">
+        <h3>Pronóstico por horas</h3>
+        <label class="feels-like-toggle">
+          <span>Sensación térmica</span>
+          <input
+            type="checkbox"
+            [checked]="showFeelsLikeInChart"
+            (change)="toggleFeelsLikeInChart()"
+          />
+          <span class="toggle-track" aria-hidden="true"></span>
+        </label>
+      </div>
 
-    @if (activeDetailsTab === 'pronostico') {
-      <article class="detail-card detail-forecast24h glass-card feature-panel">
-        <div class="panel-head">
-          <h3>Pronóstico por horas</h3>
-          <label class="feels-like-toggle">
-            <span>Sensación térmica</span>
-            <input
-              type="checkbox"
-              [checked]="showFeelsLikeInChart"
-              (change)="toggleFeelsLikeInChart()"
-            />
-            <span class="toggle-track" aria-hidden="true"></span>
-          </label>
-        </div>
+      <div #hourlyCarousel class="hourly-carousel" aria-label="Carrusel de horas">
+        @for (item of forecast24h; track item.hour; let i = $index) {
+          <app-hourly-weather-card
+            #hourChipButton
+            [forecast]="item"
+            [isSelected]="selectedForecastIndex === i"
+            [isPressed]="activeInteractionIndex === i"
+            (forecastSelected)="selectForecast(i)"
+          ></app-hourly-weather-card>
+        }
+      </div>
 
-        <div #hourlyCarousel class="hourly-carousel" aria-label="Carrusel de horas">
-          @for (item of forecast24h; track item.hour; let i = $index) {
-            <app-hourly-weather-card
-              #hourChipButton
-              [forecast]="item"
-              [isSelected]="selectedForecastIndex === i"
-              [isPressed]="activeInteractionIndex === i"
-              (forecastSelected)="selectForecast(i)"
-            ></app-hourly-weather-card>
-          }
-        </div>
-
-        @if (forecast24h.length > 0) {
-          <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
-            <div class="temperature-chart-scroll" (pointermove)="onChartPointerMove($event)">
-              <apx-chart
-                class="temperature-chart"
-                [series]="chartOptions.series"
-                [chart]="chartOptions.chart"
-                [xaxis]="chartOptions.xaxis"
-                [yaxis]="chartOptions.yaxis"
-                [stroke]="chartOptions.stroke"
-                [fill]="chartOptions.fill"
-                [dataLabels]="chartOptions.dataLabels"
-                [markers]="chartOptions.markers"
-                [grid]="chartOptions.grid"
-                [tooltip]="chartOptions.tooltip"
-                [colors]="chartOptions.colors"
-                [annotations]="chartOptions.annotations"
-              ></apx-chart>
-            </div>
-
-            <div class="precip-bar-row" aria-label="Probabilidad de lluvia por bloque horario">
-              @for (block of precipitationBlocks; track block.label) {
-                <div class="precip-bar-col">
-                  <span class="precip-bar-value">{{ block.probability }}%</span>
-                  <div class="precip-bar" [class.precip-bar-empty]="block.probability === 0">
-                    <span class="precip-bar-fill" [style.height.%]="block.heightPercent"></span>
-                  </div>
-                  <span class="precip-bar-label">{{ block.label }}</span>
-                </div>
-              }
-            </div>
+      @if (forecast24h.length > 0) {
+        <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
+          <div class="temperature-chart-scroll" (pointermove)="onChartPointerMove($event)">
+            <apx-chart
+              class="temperature-chart"
+              [series]="chartOptions.series"
+              [chart]="chartOptions.chart"
+              [xaxis]="chartOptions.xaxis"
+              [yaxis]="chartOptions.yaxis"
+              [stroke]="chartOptions.stroke"
+              [fill]="chartOptions.fill"
+              [dataLabels]="chartOptions.dataLabels"
+              [markers]="chartOptions.markers"
+              [grid]="chartOptions.grid"
+              [tooltip]="chartOptions.tooltip"
+              [colors]="chartOptions.colors"
+              [annotations]="chartOptions.annotations"
+            ></apx-chart>
           </div>
-        } @else {
-          <p class="chart-empty">Sin datos para mostrar.</p>
-        }
-      </article>
 
-      <article class="detail-card glass-card feature-panel daily-forecast-card">
-        <div class="panel-head">
-          <h3>Próximos 7 días</h3>
+          <div class="precip-bar-row" aria-label="Probabilidad de lluvia por bloque horario">
+            @for (block of precipitationBlocks; track block.label) {
+              <div class="precip-bar-col">
+                <span class="precip-bar-value">{{ block.probability }}%</span>
+                <div class="precip-bar" [class.precip-bar-empty]="block.probability === 0">
+                  <span class="precip-bar-fill" [style.height.%]="block.heightPercent"></span>
+                </div>
+                <span class="precip-bar-label">{{ block.label }}</span>
+              </div>
+            }
+          </div>
         </div>
+      } @else {
+        <p class="chart-empty">Sin datos para mostrar.</p>
+      }
+    </article>
 
-        <div class="daily-forecast-list">
-          @for (day of dailyForecast; track day.dayLabel + day.maxTemperature) {
-            <div class="daily-forecast-row">
-              <span class="daily-forecast-day">{{ day.dayLabel }}</span>
-              <span class="daily-forecast-temps">{{ day.maxTemperature }}°/{{ day.minTemperature }}°</span>
-              @if (day.iconUrl) {
-                <img class="daily-forecast-icon" [src]="day.iconUrl" [alt]="day.condition" />
-              }
-            </div>
-          }
-        </div>
+    <article class="detail-card glass-card feature-panel daily-forecast-card">
+      <div class="panel-head">
+        <h3>Próximos 7 días</h3>
+      </div>
 
-        @if (dailyForecast.length === 0) {
-          <p class="chart-empty">Sin datos para mostrar.</p>
-        } @else {
-          <button class="daily-details-button" type="button" (click)="openDailyDetails()">
-            Más detalles para el pronóstico de los 7 días
-          </button>
+      <div class="daily-forecast-list">
+        @for (day of dailyForecast; track day.dayLabel + day.maxTemperature) {
+          <div class="daily-forecast-row">
+            <span class="daily-forecast-day">{{ day.dayLabel }}</span>
+            <span class="daily-forecast-temps">{{ day.maxTemperature }}°/{{ day.minTemperature }}°</span>
+            @if (day.iconUrl) {
+              <img class="daily-forecast-icon" [src]="day.iconUrl" [alt]="day.condition" />
+            }
+          </div>
         }
-      </article>
-    }
+      </div>
 
-    @if (activeDetailsTab === 'radar') {
-      <article class="detail-card glass-card feature-panel radar-card">
-        <div class="panel-head">
-          <h3>Radar de lluvia</h3>
-          <span>{{ latitude !== null && longitude !== null ? 'En vivo' : 'Sin ubicacion' }}</span>
-        </div>
-        @if (latitude !== null && longitude !== null) {
-          @defer (on viewport) {
-            <app-rain-radar [latitude]="latitude" [longitude]="longitude"></app-rain-radar>
-          } @placeholder {
-            <div class="radar-placeholder">Desliza para ver el radar</div>
-          } @loading {
-            <div class="radar-placeholder">Cargando radar...</div>
-          }
-        } @else {
-          <p class="chart-empty">Sin ubicacion disponible para el radar.</p>
-        }
-      </article>
-    }
+      @if (dailyForecast.length === 0) {
+        <p class="chart-empty">Sin datos para mostrar.</p>
+      } @else {
+        <button class="daily-details-button" type="button" (click)="openDailyDetails()">
+          Más detalles para el pronóstico de los 7 días
+        </button>
+      }
+    </article>
+
+    <button type="button" class="detail-card glass-card feature-panel radar-entry-card" (click)="openRadarPage()">
+      <div class="panel-head">
+        <h3>Radar de lluvia</h3>
+        <span>{{ latitude !== null && longitude !== null ? 'En vivo' : 'Sin ubicacion' }}</span>
+      </div>
+      <p class="radar-entry-copy">Ver el radar de lluvia en pantalla completa</p>
+      <span class="radar-entry-cta">Abrir radar →</span>
+    </button>
   </section>
 
   @if (isInstallPromptVisible) {
@@ -292,4 +255,23 @@
   </div>
 }
 
-<app-footer (forecastTabRequested)="setDetailsTab('pronostico')" (radarTabRequested)="setDetailsTab('radar')"></app-footer>
+@if (isRadarPageOpen) {
+  <div class="radar-page" role="region" aria-label="Radar de lluvia en pantalla completa">
+    <header class="radar-page-header">
+      <button class="radar-page-back" type="button" (click)="closeRadarPage()" aria-label="Volver">
+        ← Volver
+      </button>
+      <h2>Radar de lluvia</h2>
+    </header>
+
+    <div class="radar-page-content">
+      @if (latitude !== null && longitude !== null) {
+        <app-rain-radar [latitude]="latitude" [longitude]="longitude" [fillHeight]="true"></app-rain-radar>
+      } @else {
+        <p class="chart-empty">Sin ubicacion disponible para el radar.</p>
+      }
+    </div>
+  </div>
+}
+
+<app-footer (radarPageRequested)="openRadarPage()"></app-footer>
