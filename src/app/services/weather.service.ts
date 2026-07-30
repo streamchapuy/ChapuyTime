@@ -31,8 +31,13 @@ interface OpenMeteoForecastResponse {
     time?: string[];
     temperature_2m_max?: number[];
     temperature_2m_min?: number[];
+    apparent_temperature_max?: number[];
+    apparent_temperature_min?: number[];
     weather_code?: number[];
     precipitation_probability_max?: number[];
+    precipitation_sum?: number[];
+    wind_speed_10m_max?: number[];
+    uv_index_max?: number[];
     sunrise?: string[];
     sunset?: string[];
   };
@@ -86,6 +91,14 @@ export interface DailyForecast {
   minTemperature: number;
   condition: string;
   iconUrl: string | null;
+  feelsLikeMax: number | null;
+  feelsLikeMin: number | null;
+  rainProbability: number | null;
+  precipitationSum: number | null;
+  windSpeedMax: number | null;
+  uvIndexMax: number | null;
+  sunrise: string;
+  sunset: string;
 }
 
 export interface WeatherSnapshot {
@@ -149,7 +162,7 @@ export class WeatherService {
       .set('timezone', 'auto')
       .set('current', 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day')
       .set('hourly', 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,precipitation_probability,precipitation,is_day')
-      .set('daily', 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset')
+      .set('daily', 'temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,weather_code,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,uv_index_max,sunrise,sunset')
       .set('forecast_days', '7');
 
     const reverseParams = new HttpParams()
@@ -401,7 +414,21 @@ export class WeatherService {
         maxTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_max?.[index]),
         minTemperature: this.toRoundedValue(forecast.daily?.temperature_2m_min?.[index]),
         condition: descriptor.label,
-        iconUrl: this.getIconUrl(descriptor.iconName)
+        iconUrl: this.getIconUrl(descriptor.iconName),
+        feelsLikeMax: forecast.daily?.apparent_temperature_max?.[index] !== undefined
+          ? this.toRoundedValue(forecast.daily.apparent_temperature_max[index])
+          : null,
+        feelsLikeMin: forecast.daily?.apparent_temperature_min?.[index] !== undefined
+          ? this.toRoundedValue(forecast.daily.apparent_temperature_min[index])
+          : null,
+        rainProbability: forecast.daily?.precipitation_probability_max?.[index] ?? null,
+        precipitationSum: this.toNullableDecimal(forecast.daily?.precipitation_sum?.[index]),
+        windSpeedMax: forecast.daily?.wind_speed_10m_max?.[index] !== undefined
+          ? this.toRoundedValue(forecast.daily.wind_speed_10m_max[index])
+          : null,
+        uvIndexMax: this.toNullableDecimal(forecast.daily?.uv_index_max?.[index]),
+        sunrise: this.getTimeLabel(forecast.daily?.sunrise?.[index] ?? null),
+        sunset: this.getTimeLabel(forecast.daily?.sunset?.[index] ?? null)
       };
     });
   }

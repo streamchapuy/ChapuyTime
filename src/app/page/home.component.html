@@ -69,108 +69,140 @@
   </section>
 
   <section id="pronostico" class="details-main shell" aria-label="Detalle de clima">
-    <article class="detail-card detail-forecast24h glass-card feature-panel">
-      <div class="panel-head">
-        <h3>Pronóstico por horas</h3>
-        <label class="feels-like-toggle">
-          <span>Sensación térmica</span>
-          <input
-            type="checkbox"
-            [checked]="showFeelsLikeInChart"
-            (change)="toggleFeelsLikeInChart()"
-          />
-          <span class="toggle-track" aria-hidden="true"></span>
-        </label>
-      </div>
+    <div class="details-tabs" role="tablist" aria-label="Secciones del pronostico">
+      <button
+        type="button"
+        role="tab"
+        class="details-tab"
+        [class.is-active]="activeDetailsTab === 'pronostico'"
+        [attr.aria-selected]="activeDetailsTab === 'pronostico'"
+        (click)="setDetailsTab('pronostico')"
+      >
+        Pronóstico
+      </button>
+      <button
+        id="radar"
+        type="button"
+        role="tab"
+        class="details-tab"
+        [class.is-active]="activeDetailsTab === 'radar'"
+        [attr.aria-selected]="activeDetailsTab === 'radar'"
+        (click)="setDetailsTab('radar')"
+      >
+        Radar de lluvia
+      </button>
+    </div>
 
-      <div #hourlyCarousel class="hourly-carousel" aria-label="Carrusel de horas">
-        @for (item of forecast24h; track item.hour; let i = $index) {
-          <app-hourly-weather-card
-            #hourChipButton
-            [forecast]="item"
-            [isSelected]="selectedForecastIndex === i"
-            [isPressed]="activeInteractionIndex === i"
-            (forecastSelected)="selectForecast(i)"
-          ></app-hourly-weather-card>
-        }
-      </div>
-
-      @if (forecast24h.length > 0) {
-        <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
-          <div class="temperature-chart-scroll" (pointermove)="onChartPointerMove($event)">
-            <apx-chart
-              class="temperature-chart"
-              [series]="chartOptions.series"
-              [chart]="chartOptions.chart"
-              [xaxis]="chartOptions.xaxis"
-              [yaxis]="chartOptions.yaxis"
-              [stroke]="chartOptions.stroke"
-              [fill]="chartOptions.fill"
-              [dataLabels]="chartOptions.dataLabels"
-              [markers]="chartOptions.markers"
-              [grid]="chartOptions.grid"
-              [tooltip]="chartOptions.tooltip"
-              [colors]="chartOptions.colors"
-              [annotations]="chartOptions.annotations"
-            ></apx-chart>
-          </div>
-
-          <div class="precip-bar-row" aria-label="Probabilidad de lluvia por bloque horario">
-            @for (block of precipitationBlocks; track block.label) {
-              <div class="precip-bar-col">
-                <span class="precip-bar-value">{{ block.probability }}%</span>
-                <div class="precip-bar" [class.precip-bar-empty]="block.probability === 0">
-                  <span class="precip-bar-fill" [style.height.%]="block.heightPercent"></span>
-                </div>
-                <span class="precip-bar-label">{{ block.label }}</span>
-              </div>
-            }
-          </div>
+    @if (activeDetailsTab === 'pronostico') {
+      <article class="detail-card detail-forecast24h glass-card feature-panel">
+        <div class="panel-head">
+          <h3>Pronóstico por horas</h3>
+          <label class="feels-like-toggle">
+            <span>Sensación térmica</span>
+            <input
+              type="checkbox"
+              [checked]="showFeelsLikeInChart"
+              (change)="toggleFeelsLikeInChart()"
+            />
+            <span class="toggle-track" aria-hidden="true"></span>
+          </label>
         </div>
-      } @else {
-        <p class="chart-empty">Sin datos para mostrar.</p>
-      }
-    </article>
 
-    <article class="detail-card glass-card feature-panel daily-forecast-card">
-      <div class="panel-head">
-        <h3>Próximos 7 días</h3>
-      </div>
+        <div #hourlyCarousel class="hourly-carousel" aria-label="Carrusel de horas">
+          @for (item of forecast24h; track item.hour; let i = $index) {
+            <app-hourly-weather-card
+              #hourChipButton
+              [forecast]="item"
+              [isSelected]="selectedForecastIndex === i"
+              [isPressed]="activeInteractionIndex === i"
+              (forecastSelected)="selectForecast(i)"
+            ></app-hourly-weather-card>
+          }
+        </div>
 
-      <div class="daily-forecast-list">
-        @for (day of dailyForecast; track day.dayLabel + day.maxTemperature) {
-          <div class="daily-forecast-row">
-            <span class="daily-forecast-day">{{ day.dayLabel }}</span>
-            <span class="daily-forecast-temps">{{ day.maxTemperature }}°/{{ day.minTemperature }}°</span>
-            @if (day.iconUrl) {
-              <img class="daily-forecast-icon" [src]="day.iconUrl" [alt]="day.condition" />
-            }
+        @if (forecast24h.length > 0) {
+          <div class="temperature-chart-card" aria-label="Grafico de evolucion de temperatura">
+            <div class="temperature-chart-scroll" (pointermove)="onChartPointerMove($event)">
+              <apx-chart
+                class="temperature-chart"
+                [series]="chartOptions.series"
+                [chart]="chartOptions.chart"
+                [xaxis]="chartOptions.xaxis"
+                [yaxis]="chartOptions.yaxis"
+                [stroke]="chartOptions.stroke"
+                [fill]="chartOptions.fill"
+                [dataLabels]="chartOptions.dataLabels"
+                [markers]="chartOptions.markers"
+                [grid]="chartOptions.grid"
+                [tooltip]="chartOptions.tooltip"
+                [colors]="chartOptions.colors"
+                [annotations]="chartOptions.annotations"
+              ></apx-chart>
+            </div>
+
+            <div class="precip-bar-row" aria-label="Probabilidad de lluvia por bloque horario">
+              @for (block of precipitationBlocks; track block.label) {
+                <div class="precip-bar-col">
+                  <span class="precip-bar-value">{{ block.probability }}%</span>
+                  <div class="precip-bar" [class.precip-bar-empty]="block.probability === 0">
+                    <span class="precip-bar-fill" [style.height.%]="block.heightPercent"></span>
+                  </div>
+                  <span class="precip-bar-label">{{ block.label }}</span>
+                </div>
+              }
+            </div>
           </div>
+        } @else {
+          <p class="chart-empty">Sin datos para mostrar.</p>
         }
-      </div>
+      </article>
 
-      @if (dailyForecast.length === 0) {
-        <p class="chart-empty">Sin datos para mostrar.</p>
-      }
-    </article>
+      <article class="detail-card glass-card feature-panel daily-forecast-card">
+        <div class="panel-head">
+          <h3>Próximos 7 días</h3>
+        </div>
 
-    <article id="radar" class="detail-card glass-card feature-panel radar-card">
-      <div class="panel-head">
-        <h3>Radar de lluvia</h3>
-        <span>{{ latitude !== null && longitude !== null ? 'En vivo' : 'Sin ubicacion' }}</span>
-      </div>
-      @if (latitude !== null && longitude !== null) {
-        @defer (on viewport) {
-          <app-rain-radar [latitude]="latitude" [longitude]="longitude"></app-rain-radar>
-        } @placeholder {
-          <div class="radar-placeholder">Desliza para ver el radar</div>
-        } @loading {
-          <div class="radar-placeholder">Cargando radar...</div>
+        <div class="daily-forecast-list">
+          @for (day of dailyForecast; track day.dayLabel + day.maxTemperature) {
+            <div class="daily-forecast-row">
+              <span class="daily-forecast-day">{{ day.dayLabel }}</span>
+              <span class="daily-forecast-temps">{{ day.maxTemperature }}°/{{ day.minTemperature }}°</span>
+              @if (day.iconUrl) {
+                <img class="daily-forecast-icon" [src]="day.iconUrl" [alt]="day.condition" />
+              }
+            </div>
+          }
+        </div>
+
+        @if (dailyForecast.length === 0) {
+          <p class="chart-empty">Sin datos para mostrar.</p>
+        } @else {
+          <button class="daily-details-button" type="button" (click)="openDailyDetails()">
+            Más detalles para el pronóstico de los 7 días
+          </button>
         }
-      } @else {
-        <p class="chart-empty">Sin ubicacion disponible para el radar.</p>
-      }
-    </article>
+      </article>
+    }
+
+    @if (activeDetailsTab === 'radar') {
+      <article class="detail-card glass-card feature-panel radar-card">
+        <div class="panel-head">
+          <h3>Radar de lluvia</h3>
+          <span>{{ latitude !== null && longitude !== null ? 'En vivo' : 'Sin ubicacion' }}</span>
+        </div>
+        @if (latitude !== null && longitude !== null) {
+          @defer (on viewport) {
+            <app-rain-radar [latitude]="latitude" [longitude]="longitude"></app-rain-radar>
+          } @placeholder {
+            <div class="radar-placeholder">Desliza para ver el radar</div>
+          } @loading {
+            <div class="radar-placeholder">Cargando radar...</div>
+          }
+        } @else {
+          <p class="chart-empty">Sin ubicacion disponible para el radar.</p>
+        }
+      </article>
+    }
   </section>
 
   @if (isInstallPromptVisible) {
@@ -189,4 +221,75 @@
   }
 </main>
 
-<app-footer></app-footer>
+@if (isDailyDetailsOpen) {
+  <div
+    class="daily-details-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Detalle del pronostico de 7 dias"
+    (click)="closeDailyDetails()"
+  >
+    <div class="daily-details-panel glass-card" (click)="$event.stopPropagation()">
+      <div class="panel-head daily-details-head">
+        <h3>Detalle de los próximos 7 días</h3>
+        <button class="daily-details-close" type="button" (click)="closeDailyDetails()" aria-label="Cerrar detalles">
+          ✕
+        </button>
+      </div>
+
+      <div class="daily-details-list">
+        @for (day of dailyForecast; track day.dayLabel + day.maxTemperature) {
+          <article class="daily-details-item">
+            <header class="daily-details-item-head">
+              @if (day.iconUrl) {
+                <img class="daily-details-icon" [src]="day.iconUrl" [alt]="day.condition" />
+              }
+              <div class="daily-details-item-title">
+                <strong>{{ day.dayLabel }}</strong>
+                <span>{{ day.condition }}</span>
+              </div>
+              <span class="daily-details-temps">{{ day.maxTemperature }}°/{{ day.minTemperature }}°</span>
+            </header>
+
+            <dl class="daily-details-grid">
+              <div class="daily-details-stat">
+                <dt>Sensación máx./mín.</dt>
+                <dd>{{ day.feelsLikeMax !== null ? day.feelsLikeMax + '°' : '--' }}/{{ day.feelsLikeMin !== null ? day.feelsLikeMin + '°' : '--' }}</dd>
+              </div>
+              <div class="daily-details-stat">
+                <dt>Prob. lluvia</dt>
+                <dd>{{ day.rainProbability !== null ? day.rainProbability + '%' : '--' }}</dd>
+              </div>
+              <div class="daily-details-stat">
+                <dt>Lluvia acum.</dt>
+                <dd>{{ day.precipitationSum !== null ? day.precipitationSum + ' mm' : '--' }}</dd>
+              </div>
+              <div class="daily-details-stat">
+                <dt>Viento máx.</dt>
+                <dd>{{ day.windSpeedMax !== null ? day.windSpeedMax + ' km/h' : '--' }}</dd>
+              </div>
+              <div class="daily-details-stat">
+                <dt>Índice UV</dt>
+                <dd>{{ day.uvIndexMax !== null ? day.uvIndexMax : '--' }}</dd>
+              </div>
+              <div class="daily-details-stat">
+                <dt>Amanecer</dt>
+                <dd>{{ day.sunrise }}</dd>
+              </div>
+              <div class="daily-details-stat">
+                <dt>Atardecer</dt>
+                <dd>{{ day.sunset }}</dd>
+              </div>
+            </dl>
+          </article>
+        }
+
+        @if (dailyForecast.length === 0) {
+          <p class="chart-empty">Sin datos para mostrar.</p>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<app-footer (forecastTabRequested)="setDetailsTab('pronostico')" (radarTabRequested)="setDetailsTab('radar')"></app-footer>
