@@ -157,15 +157,6 @@
         </button>
       }
     </article>
-
-    <button type="button" class="detail-card glass-card feature-panel radar-entry-card" (click)="openRadarPage()">
-      <div class="panel-head">
-        <h3>Radar de lluvia</h3>
-        <span>{{ latitude !== null && longitude !== null ? 'En vivo' : 'Sin ubicacion' }}</span>
-      </div>
-      <p class="radar-entry-copy">Ver el radar de lluvia en pantalla completa</p>
-      <span class="radar-entry-cta">Abrir radar →</span>
-    </button>
   </section>
 
   @if (isInstallPromptVisible) {
