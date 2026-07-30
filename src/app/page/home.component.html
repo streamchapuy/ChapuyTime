@@ -135,6 +135,11 @@
     <article class="detail-card glass-card feature-panel daily-forecast-card">
       <div class="panel-head">
         <h3>Próximos 7 días</h3>
+        @if (dailyForecast.length > 0) {
+          <button class="daily-details-button" type="button" (click)="openDailyDetails()">
+            Más detalles
+          </button>
+        }
       </div>
 
       <div class="daily-forecast-list">
@@ -151,10 +156,6 @@
 
       @if (dailyForecast.length === 0) {
         <p class="chart-empty">Sin datos para mostrar.</p>
-      } @else {
-        <button class="daily-details-button" type="button" (click)="openDailyDetails()">
-          Más detalles para el pronóstico de los 7 días
-        </button>
       }
     </article>
   </section>
