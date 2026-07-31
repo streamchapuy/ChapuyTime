@@ -108,6 +108,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = true;
   canInstallApp = false;
   isInstallPromptVisible = false;
+  isOffline = !navigator.onLine;
 
   chartOptions: TemperatureChartOptions = {
     series: [{ name: 'Temperatura', data: [] }],
@@ -373,6 +374,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   closeRadarPage(): void {
     this.isRadarPageOpen = false;
+  }
+
+  @HostListener('window:online')
+  onWindowOnline(): void {
+    this.isOffline = false;
+  }
+
+  @HostListener('window:offline')
+  onWindowOffline(): void {
+    this.isOffline = true;
   }
 
   @HostListener('document:keydown.escape')

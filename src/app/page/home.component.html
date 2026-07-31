@@ -12,6 +12,10 @@
 
       <p class="weather-time">{{ currentTimeLabel }}</p>
 
+      @if (isOffline) {
+        <p class="offline-banner">📡 Sin conexión · mostrando último dato guardado</p>
+      }
+
       <div class="weather-temp-row">
         @if (weatherIconUrl) {
           <img class="weather-icon" [src]="weatherIconUrl" [alt]="currentCondition" />

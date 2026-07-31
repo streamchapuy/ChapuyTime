@@ -26,5 +26,31 @@
         ]
       }
     }
+  ],
+  "dataGroups": [
+    {
+      "name": "weather-api",
+      "urls": [
+        "https://api.open-meteo.com/v1/forecast**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 20,
+        "maxAge": "6h",
+        "timeout": "5s"
+      }
+    },
+    {
+      "name": "geocoding-api",
+      "urls": [
+        "https://nominatim.openstreetmap.org/reverse**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 20,
+        "maxAge": "24h",
+        "timeout": "5s"
+      }
+    }
   ]
 }

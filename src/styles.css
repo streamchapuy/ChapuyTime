@@ -444,6 +444,19 @@ app-home .weather-feels-like {
 	opacity: 0.8;
 }
 
+app-home .offline-banner {
+	position: relative;
+	display: inline-block;
+	margin: 6px auto 0;
+	padding: 4px 12px;
+	border-radius: 999px;
+	background: rgba(255, 193, 7, 0.16);
+	border: 1px solid rgba(255, 193, 7, 0.35);
+	color: #ffd873;
+	font-size: 0.78rem;
+	font-weight: 600;
+}
+
 app-home .weather-divider {
 	position: relative;
 	margin: 16px 0;
