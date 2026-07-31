@@ -43,3 +43,10 @@ Thumbs.db
 
 # Debug screenshots (Playwright/dev QA)
 /*.png
+
+# Capacitor (Android) - assets generados por `npx cap sync`, se regeneran a partir del build web
+/android/app/src/main/assets/public
+/android/app/src/main/assets/capacitor.config.json
+
+# JDK portable usado para compilar el proyecto Android localmente
+/.tools

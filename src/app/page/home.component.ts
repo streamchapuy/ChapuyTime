@@ -27,10 +27,13 @@ import {
   NgApexchartsModule
 } from 'ng-apexcharts';
 
+import { Capacitor } from '@capacitor/core';
+
 import { FooterComponent } from '../Component/footer/footer.component';
 import { HeaderComponent } from '../Component/header/header.component';
 import { HourlyWeatherCardComponent } from '../Component/hourly-weather-card/hourly-weather-card.component';
 import { RainRadarComponent } from '../Component/rain-radar/rain-radar.component';
+import { WeatherWidget } from '../native/weather-widget.plugin';
 import { DailyForecast, HourlyForecast, SunEvent, WeatherService } from '../services/weather.service';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -386,6 +389,22 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isOffline = true;
   }
 
+  // Envia el ultimo clima obtenido al widget nativo de Android (no-op en web/PWA).
+  private syncWeatherWidget(): void {
+    if (!Capacitor.isNativePlatform()) {
+      return;
+    }
+
+    WeatherWidget.update({
+      location: this.currentLocation,
+      temperature: this.currentTemperature !== null ? `${this.currentTemperature}°C` : '--',
+      condition: this.currentCondition,
+      updatedAt: this.currentTimeLabel
+    }).catch(() => {
+      // Si el plugin nativo falla, no debe afectar la experiencia web.
+    });
+  }
+
   @HostListener('document:keydown.escape')
   onEscapeKeydown(): void {
     if (this.isRadarPageOpen) {
@@ -527,6 +546,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.scrollSelectedHourIntoView('auto');
               });
               this.errorMessage = '';
+              this.syncWeatherWidget();
             },
             error: (error: HttpErrorResponse) => {
               this.errorMessage = this.resolveErrorMessage(error);
