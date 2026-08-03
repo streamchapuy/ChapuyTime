@@ -7,7 +7,16 @@
     (click)="toggleExpand()"
     [attr.aria-label]="isExpanded ? 'Salir de pantalla completa' : 'Ver en pantalla completa'"
   >
-    {{ isExpanded ? '✕' : '⛶' }}
+    @if (isExpanded) {
+      <span class="rain-radar-icon-close" aria-hidden="true"></span>
+    } @else {
+      <span class="rain-radar-icon-expand" aria-hidden="true">
+        <span class="rain-radar-icon-corner"></span>
+        <span class="rain-radar-icon-corner"></span>
+        <span class="rain-radar-icon-corner"></span>
+        <span class="rain-radar-icon-corner"></span>
+      </span>
+    }
   </button>
 
   @if (isLoading) {
