@@ -4,6 +4,7 @@
 
 .rain-radar {
   position: relative;
+  width: 100%;
   border-radius: 12px;
   overflow: hidden;
   background: rgba(7, 30, 53, 0.34);

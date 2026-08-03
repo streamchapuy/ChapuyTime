@@ -2045,6 +2045,7 @@ app-home .radar-page-content {
 app-home .radar-page-content app-rain-radar {
 	display: flex;
 	flex: 1;
+	min-width: 0;
 	min-height: 0;
 }
 
