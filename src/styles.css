@@ -369,6 +369,93 @@ app-home .weather-city {
 	text-align: center;
 }
 
+app-home .save-location-btn {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border: none;
+	background: transparent;
+	padding: 0;
+	cursor: pointer;
+	color: rgba(228, 241, 255, 0.55);
+}
+
+app-home .save-location-btn:disabled {
+	cursor: default;
+}
+
+app-home .save-location-btn.is-saved {
+	color: #ffd166;
+}
+
+app-home .save-location-star {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	border: 2px solid currentColor;
+	box-sizing: border-box;
+	transition: background-color 0.15s ease;
+}
+
+app-home .save-location-btn.is-saved .save-location-star {
+	background: currentColor;
+}
+
+app-home .location-switcher {
+	position: relative;
+	display: flex;
+	gap: 8px;
+	margin: 10px 0 0;
+	padding: 0 2px 2px;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+app-home .location-switcher::-webkit-scrollbar {
+	display: none;
+}
+
+app-home .location-chip {
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	background: rgba(255, 255, 255, 0.06);
+	color: rgba(228, 241, 255, 0.82);
+	font-size: 0.76rem;
+	font-weight: 600;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+app-home .location-chip.is-active {
+	background: rgba(155, 220, 255, 0.18);
+	border-color: rgba(155, 220, 255, 0.5);
+	color: #f5fbff;
+}
+
+app-home .location-chip-remove {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 14px;
+	height: 14px;
+	font-size: 0.6rem;
+	opacity: 0.65;
+}
+
+app-home .location-chip-remove:hover {
+	opacity: 1;
+}
+
 app-home .weather-temp-row {
 	position: relative;
 	display: flex;

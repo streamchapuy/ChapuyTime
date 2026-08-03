@@ -51,6 +51,40 @@
         "maxAge": "24h",
         "timeout": "5s"
       }
+    },
+    {
+      "name": "rainviewer-frames-api",
+      "urls": [
+        "https://api.rainviewer.com/public/weather-maps.json**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 5,
+        "maxAge": "1h",
+        "timeout": "5s"
+      }
+    },
+    {
+      "name": "rainviewer-tiles",
+      "urls": [
+        "https://*.rainviewer.com/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 300,
+        "maxAge": "3d"
+      }
+    },
+    {
+      "name": "radar-basemap-tiles",
+      "urls": [
+        "https://*.basemaps.cartocdn.com/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 300,
+        "maxAge": "30d"
+      }
     }
   ]
 }

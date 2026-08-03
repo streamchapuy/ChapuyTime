@@ -34,6 +34,7 @@ import { HeaderComponent } from '../Component/header/header.component';
 import { HourlyWeatherCardComponent } from '../Component/hourly-weather-card/hourly-weather-card.component';
 import { RainRadarComponent } from '../Component/rain-radar/rain-radar.component';
 import { WeatherWidget } from '../native/weather-widget.plugin';
+import { LocationsService, SavedLocation } from '../services/locations.service';
 import { DailyForecast, HourlyForecast, SunEvent, WeatherService } from '../services/weather.service';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -76,6 +77,7 @@ interface PrecipitationBlock {
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly weatherService = inject(WeatherService);
+  private readonly locationsService = inject(LocationsService);
   private deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
   private interactionResetTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -112,6 +114,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   canInstallApp = false;
   isInstallPromptVisible = false;
   isOffline = !navigator.onLine;
+  savedLocations: SavedLocation[] = [];
+  activeLocationId: string | null = null;
+
+  get isCurrentLocationSaved(): boolean {
+    return this.latitude !== null && this.longitude !== null
+      && this.locationsService.isSaved(this.latitude, this.longitude);
+  }
 
   chartOptions: TemperatureChartOptions = {
     series: [{ name: 'Temperatura', data: [] }],
@@ -495,6 +504,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.isInstallPromptVisible = !this.isRunningStandalone();
+    this.locationsService.locations$.subscribe((locations) => (this.savedLocations = locations));
 
     if (!this.weatherService.hasApiKey()) {
       this.errorMessage = 'No se encontro configurado el endpoint de Open-Meteo.';
@@ -503,6 +513,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    this.detectDeviceLocation();
+  }
+
+  // Ubicacion actual del dispositivo via GPS (opcion por defecto, no se guarda como favorita).
+  detectDeviceLocation(): void {
     if (!navigator.geolocation) {
       this.errorMessage = 'Tu navegador no soporta geolocalizacion.';
       this.currentCondition = 'Location unavailable';
@@ -510,75 +525,19 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    this.activeLocationId = null;
+    this.isLoading = true;
+    this.currentLocation = 'Obteniendo ubicacion precisa...';
+
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        const latitude = coords.latitude;
-        const longitude = coords.longitude;
-        this.latitude = latitude;
-        this.longitude = longitude;
         this.currentLocation = 'Ubicando...';
-
-        this.weatherService
-          .getCurrentWeather(latitude, longitude)
-          .pipe(finalize(() => (this.isLoading = false)))
-          .subscribe({
-            next: (weather) => {
-              this.currentLocation = weather.location;
-              this.currentTemperature = weather.temperature;
-              this.feelsLikeTemperature = weather.feelsLikeTemperature;
-              this.minTemperature = weather.minTemperature;
-              this.maxTemperature = weather.maxTemperature;
-              this.currentCondition = weather.condition;
-              this.weatherIconUrl = weather.iconUrl;
-              this.humidity = weather.humidity;
-              this.windSpeed = weather.windSpeed;
-              this.windDirection = weather.windDirection;
-              this.windDirectionDegrees = weather.windDirectionDegrees;
-              this.uvIndex = weather.uvIndex;
-              this.rainProbabilityToday = weather.rainProbabilityToday;
-              this.currentTimeLabel = weather.currentTimeLabel;
-              this.forecast24h = weather.hourly24h;
-              this.dailyForecast = weather.dailyForecast;
-              this.sunEvents = weather.sunEvents;
-              this.selectedForecastIndex = 0;
-              this.refreshTemperatureChart();
-              queueMicrotask(() => {
-                this.scrollSelectedHourIntoView('auto');
-              });
-              this.errorMessage = '';
-              this.syncWeatherWidget();
-            },
-            error: (error: HttpErrorResponse) => {
-              this.errorMessage = this.resolveErrorMessage(error);
-              this.currentCondition = 'Weather unavailable';
-              this.weatherIconUrl = null;
-              this.feelsLikeTemperature = null;
-              this.humidity = null;
-              this.windSpeed = null;
-              this.windDirection = null;
-              this.windDirectionDegrees = null;
-              this.uvIndex = null;
-              this.rainProbabilityToday = null;
-              this.forecast24h = [];
-              this.dailyForecast = [];
-              this.sunEvents = [];
-            }
-          });
+        this.loadWeatherForLocation(coords.latitude, coords.longitude);
       },
       () => {
         this.errorMessage = 'No fue posible obtener tu ubicacion actual.';
         this.currentCondition = 'Location unavailable';
-        this.weatherIconUrl = null;
-        this.feelsLikeTemperature = null;
-        this.humidity = null;
-        this.windSpeed = null;
-        this.windDirection = null;
-        this.windDirectionDegrees = null;
-        this.uvIndex = null;
-        this.rainProbabilityToday = null;
-        this.forecast24h = [];
-        this.dailyForecast = [];
-        this.sunEvents = [];
+        this.clearWeatherData();
         this.isLoading = false;
       },
       {
@@ -587,6 +546,94 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         maximumAge: 0
       }
     );
+  }
+
+  // Cambia a una ubicacion favorita guardada y carga su clima.
+  selectLocation(location: SavedLocation): void {
+    if (this.activeLocationId === location.id) {
+      return;
+    }
+
+    this.activeLocationId = location.id;
+    this.currentLocation = location.label;
+    this.isLoading = true;
+    this.loadWeatherForLocation(location.latitude, location.longitude);
+  }
+
+  saveCurrentAsFavorite(): void {
+    if (this.latitude === null || this.longitude === null || this.isCurrentLocationSaved) {
+      return;
+    }
+
+    this.locationsService.add(this.currentLocation, this.latitude, this.longitude);
+  }
+
+  removeFavorite(location: SavedLocation, event: Event): void {
+    event.stopPropagation();
+    this.locationsService.remove(location.id);
+
+    if (this.activeLocationId === location.id) {
+      this.detectDeviceLocation();
+    }
+  }
+
+  private loadWeatherForLocation(latitude: number, longitude: number): void {
+    this.latitude = latitude;
+    this.longitude = longitude;
+
+    this.weatherService
+      .getCurrentWeather(latitude, longitude)
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: (weather) => {
+          if (this.activeLocationId === null) {
+            this.currentLocation = weather.location;
+          }
+
+          this.currentTemperature = weather.temperature;
+          this.feelsLikeTemperature = weather.feelsLikeTemperature;
+          this.minTemperature = weather.minTemperature;
+          this.maxTemperature = weather.maxTemperature;
+          this.currentCondition = weather.condition;
+          this.weatherIconUrl = weather.iconUrl;
+          this.humidity = weather.humidity;
+          this.windSpeed = weather.windSpeed;
+          this.windDirection = weather.windDirection;
+          this.windDirectionDegrees = weather.windDirectionDegrees;
+          this.uvIndex = weather.uvIndex;
+          this.rainProbabilityToday = weather.rainProbabilityToday;
+          this.currentTimeLabel = weather.currentTimeLabel;
+          this.forecast24h = weather.hourly24h;
+          this.dailyForecast = weather.dailyForecast;
+          this.sunEvents = weather.sunEvents;
+          this.selectedForecastIndex = 0;
+          this.refreshTemperatureChart();
+          queueMicrotask(() => {
+            this.scrollSelectedHourIntoView('auto');
+          });
+          this.errorMessage = '';
+          this.syncWeatherWidget();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.errorMessage = this.resolveErrorMessage(error);
+          this.currentCondition = 'Weather unavailable';
+          this.clearWeatherData();
+        }
+      });
+  }
+
+  private clearWeatherData(): void {
+    this.weatherIconUrl = null;
+    this.feelsLikeTemperature = null;
+    this.humidity = null;
+    this.windSpeed = null;
+    this.windDirection = null;
+    this.windDirectionDegrees = null;
+    this.uvIndex = null;
+    this.rainProbabilityToday = null;
+    this.forecast24h = [];
+    this.dailyForecast = [];
+    this.sunEvents = [];
   }
 
   async installApp(): Promise<void> {

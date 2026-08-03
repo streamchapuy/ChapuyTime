@@ -5,10 +5,44 @@
     <article class="weather-card hero-card">
       <div class="hero-topline">
         <h2 class="weather-city">{{ currentLocation }}</h2>
+        <button
+          type="button"
+          class="save-location-btn"
+          [class.is-saved]="isCurrentLocationSaved"
+          [disabled]="isCurrentLocationSaved || latitude === null"
+          (click)="saveCurrentAsFavorite()"
+          [attr.aria-label]="isCurrentLocationSaved ? 'Ubicacion guardada en favoritos' : 'Guardar ubicacion actual en favoritos'"
+        >
+          <span class="save-location-star" aria-hidden="true"></span>
+        </button>
         <span class="live-pill">
           <span class="live-dot" aria-hidden="true"></span>
         </span>
       </div>
+
+      @if (savedLocations.length > 0) {
+        <div class="location-switcher" role="tablist" aria-label="Ubicaciones guardadas">
+          <button
+            type="button"
+            class="location-chip"
+            [class.is-active]="activeLocationId === null"
+            (click)="detectDeviceLocation()"
+          >
+            📍 Mi ubicación
+          </button>
+          @for (location of savedLocations; track location.id) {
+            <button
+              type="button"
+              class="location-chip"
+              [class.is-active]="activeLocationId === location.id"
+              (click)="selectLocation(location)"
+            >
+              {{ location.label }}
+              <span class="location-chip-remove" (click)="removeFavorite(location, $event)" aria-label="Quitar de favoritos">✕</span>
+            </button>
+          }
+        </div>
+      }
 
       <p class="weather-time">{{ currentTimeLabel }}</p>
 
