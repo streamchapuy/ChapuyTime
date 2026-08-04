@@ -103,6 +103,19 @@
           <strong>{{ windSpeed !== null ? windSpeed + ' km/h' : '--' }}</strong>
         </div>
       </div>
+
+      <hr class="weather-divider" />
+
+      <div class="weather-uvwind-row">
+        <div class="weather-stat">
+          <span>Humedad</span>
+          <strong>{{ humidity !== null ? humidity + '%' : '--' }}</strong>
+        </div>
+        <div class="weather-stat">
+          <span>Dirección viento</span>
+          <strong>{{ windDirection !== null ? windDirection : '--' }}</strong>
+        </div>
+      </div>
     </article>
   </section>
 
