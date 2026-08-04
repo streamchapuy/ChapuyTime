@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { Messaging, getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { Functions, getFunctions, httpsCallable } from 'firebase/functions';
 import { FIREBASE_CONFIG, FIREBASE_VAPID_KEY } from '../config/firebase.config';
+import { LocationsService } from './locations.service';
 
 const FCM_TOKEN_STORAGE_KEY = 'nimbus.fcmToken.v1';
 const FCM_SW_SCOPE = '/firebase-cloud-messaging-push-scope';
@@ -12,6 +14,12 @@ export type PushPermissionState = NotificationPermission | 'unsupported';
 export class PushNotificationService {
   private app: FirebaseApp | null = null;
   private messaging: Messaging | null = null;
+  private functions: Functions | null = null;
+
+  constructor(private readonly locationsService: LocationsService) {
+    // Si el usuario ya activo notificaciones, mantiene el backend al dia cuando cambian sus favoritos.
+    this.locationsService.locations$.subscribe(() => this.syncLocationsIfEnabled());
+  }
 
   isSupported(): boolean {
     return typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator;
@@ -45,7 +53,7 @@ export class PushNotificationService {
 
     if (token) {
       localStorage.setItem(FCM_TOKEN_STORAGE_KEY, token);
-      // TODO: sincronizar este token con Firestore junto a las ubicaciones favoritas cuando exista el backend de push.
+      await this.registerDevice(token);
     }
 
     onMessage(messaging, (payload) => this.showForegroundNotification(payload));
@@ -57,12 +65,47 @@ export class PushNotificationService {
     return localStorage.getItem(FCM_TOKEN_STORAGE_KEY);
   }
 
+  private async syncLocationsIfEnabled(): Promise<void> {
+    const token = this.getStoredToken();
+    if (token) {
+      await this.registerDevice(token);
+    }
+  }
+
+  private async registerDevice(token: string): Promise<void> {
+    const registerDeviceFn = httpsCallable(this.getFunctionsInstance(), 'registerDevice');
+    const locations = this.locationsService.list().map((loc) => ({
+      label: loc.label,
+      latitude: loc.latitude,
+      longitude: loc.longitude
+    }));
+
+    try {
+      await registerDeviceFn({ token, locations });
+    } catch (error) {
+      console.error('No se pudo registrar el dispositivo para notificaciones push', error);
+    }
+  }
+
+  private getFunctionsInstance(): Functions {
+    if (!this.functions) {
+      this.functions = getFunctions(this.getAppInstance());
+    }
+    return this.functions;
+  }
+
   private getMessagingInstance(): Messaging {
     if (!this.messaging) {
-      this.app = initializeApp(FIREBASE_CONFIG);
-      this.messaging = getMessaging(this.app);
+      this.messaging = getMessaging(this.getAppInstance());
     }
     return this.messaging;
+  }
+
+  private getAppInstance(): FirebaseApp {
+    if (!this.app) {
+      this.app = initializeApp(FIREBASE_CONFIG);
+    }
+    return this.app;
   }
 
   private showForegroundNotification(payload: { notification?: { title?: string; body?: string } }): void {

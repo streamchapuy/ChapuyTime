@@ -1,0 +1,10 @@
+rules_version='2'
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Solo Cloud Functions (Admin SDK) accede a Firestore; el cliente nunca escribe directo.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
