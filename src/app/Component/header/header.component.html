@@ -14,7 +14,20 @@
     </h1>
   </div>
 
-  <button class="icon-button" type="button" aria-label="Buscar ciudad">
-    <span class="search-icon" aria-hidden="true"></span>
-  </button>
+  <div class="header-group">
+    @if (notificationsSupported) {
+      <button
+        class="icon-button"
+        type="button"
+        [attr.aria-label]="notificationsEnabled ? 'Notificaciones activadas' : 'Activar notificaciones'"
+        [class.is-active]="notificationsEnabled"
+        (click)="onToggleNotifications()">
+        <span class="bell-icon" aria-hidden="true"></span>
+      </button>
+    }
+
+    <button class="icon-button" type="button" aria-label="Buscar ciudad">
+      <span class="search-icon" aria-hidden="true"></span>
+    </button>
+  </div>
 </header>

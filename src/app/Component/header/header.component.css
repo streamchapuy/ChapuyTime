@@ -92,6 +92,46 @@
   transform-origin: center;
 }
 
+.bell-icon {
+  position: relative;
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-top: -2px;
+  border: 2.25px solid currentColor;
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+}
+
+.bell-icon::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 12px;
+  height: 8px;
+  border: 2.25px solid currentColor;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  transform: translateX(-50%);
+}
+
+.bell-icon::after {
+  content: '';
+  position: absolute;
+  bottom: -4.5px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.icon-button.is-active {
+  color: #ffd166;
+}
+
 @media (min-width: 721px) {
   .weather-header {
     min-height: 96px;
