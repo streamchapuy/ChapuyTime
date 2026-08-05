@@ -13,6 +13,7 @@ interface OpenMeteoForecastResponse {
     wind_speed_10m?: number;
     wind_direction_10m?: number;
     uv_index?: number;
+    cloud_cover?: number;
     is_day?: number;
     time?: string;
   };
@@ -114,6 +115,7 @@ export interface WeatherSnapshot {
   windDirection: string | null;
   windDirectionDegrees: number | null;
   uvIndex: number | null;
+  cloudCover: number | null;
   rainProbabilityToday: number | null;
   currentTimeLabel: string;
   hourly24h: HourlyForecast[];
@@ -160,7 +162,7 @@ export class WeatherService {
       .set('latitude', lat)
       .set('longitude', lon)
       .set('timezone', 'auto')
-      .set('current', 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day')
+      .set('current', 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,cloud_cover,is_day')
       .set('hourly', 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,precipitation_probability,precipitation,is_day')
       .set('daily', 'temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,weather_code,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,uv_index_max,sunrise,sunset')
       .set('forecast_days', '7');
@@ -201,6 +203,7 @@ export class WeatherService {
           windDirection: this.toCardinalDirection(windDirectionDegrees),
           windDirectionDegrees,
           uvIndex: this.toNullableDecimal(current?.uv_index),
+          cloudCover: current?.cloud_cover !== undefined ? Math.round(current.cloud_cover) : null,
           rainProbabilityToday: forecast.daily?.precipitation_probability_max?.[0] ?? null,
           currentTimeLabel: this.getTimeLabel(currentTime),
           hourly24h,

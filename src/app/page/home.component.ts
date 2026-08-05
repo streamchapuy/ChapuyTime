@@ -98,6 +98,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   windDirection: string | null = null;
   windDirectionDegrees: number | null = null;
   uvIndex: number | null = null;
+  cloudCover: number | null = null;
   rainProbabilityToday: number | null = null;
   currentTimeLabel = '--:--';
   forecast24h: HourlyForecast[] = [];
@@ -304,6 +305,192 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     return Math.max(0, Math.min(100, (this.uvIndex / 11) * 100));
+  }
+
+  get uvStatusDescription(): string {
+    if (this.uvIndex === null) {
+      return 'Sin datos disponibles.';
+    }
+
+    if (this.uvIndex <= 2) {
+      return 'Podés estar al aire libre sin protección especial.';
+    }
+
+    if (this.uvIndex <= 5) {
+      return 'Usá protector solar si vas a estar expuesto un tiempo prolongado.';
+    }
+
+    if (this.uvIndex <= 7) {
+      return 'Buscá sombra en las horas centrales del día y usá protector solar.';
+    }
+
+    return 'Evitá la exposición prolongada al sol, usá protector solar y gafas.';
+  }
+
+  get feelsLikeStatusLabel(): string {
+    if (this.feelsLikeTemperature === null || this.currentTemperature === null) {
+      return 'Sin datos';
+    }
+
+    const diff = this.feelsLikeTemperature - this.currentTemperature;
+
+    if (diff >= 2) {
+      return 'Más cálido';
+    }
+
+    if (diff <= -2) {
+      return 'Más fresco';
+    }
+
+    return 'Agradable';
+  }
+
+  get feelsLikeDescription(): string {
+    if (this.feelsLikeTemperature === null || this.currentTemperature === null) {
+      return 'Sin datos disponibles.';
+    }
+
+    const diff = this.feelsLikeTemperature - this.currentTemperature;
+
+    if (diff >= 2) {
+      return `La sensación térmica es ${diff}° más cálida que la temperatura real, principalmente por la humedad.`;
+    }
+
+    if (diff <= -2) {
+      return `La sensación térmica es ${Math.abs(diff)}° más fresca que la temperatura real, principalmente por el viento.`;
+    }
+
+    return 'La sensación térmica es similar a la temperatura real.';
+  }
+
+  get humidityStatusLabel(): string {
+    if (this.humidity === null) {
+      return 'Sin datos';
+    }
+
+    if (this.humidity < 30) {
+      return 'Seco';
+    }
+
+    if (this.humidity <= 60) {
+      return 'Confortable';
+    }
+
+    return 'Húmedo';
+  }
+
+  get humidityDescription(): string {
+    if (this.humidity === null) {
+      return 'Sin datos disponibles.';
+    }
+
+    if (this.humidity < 30) {
+      return 'El ambiente está seco, puede resecar la piel y las vías respiratorias.';
+    }
+
+    if (this.humidity <= 60) {
+      return 'Nivel de humedad confortable para la mayoría de las personas.';
+    }
+
+    return 'Ambiente húmedo, la sensación de calor puede ser mayor a la real.';
+  }
+
+  get windStatusLabel(): string {
+    if (this.windSpeed === null) {
+      return 'Sin datos';
+    }
+
+    if (this.windSpeed < 12) {
+      return 'Suave';
+    }
+
+    if (this.windSpeed < 30) {
+      return 'Moderado';
+    }
+
+    return 'Fuerte';
+  }
+
+  get windDescription(): string {
+    if (this.windSpeed === null) {
+      return 'Sin datos disponibles.';
+    }
+
+    const direction = this.windDirection ? ` desde el ${this.windDirection}` : '';
+
+    if (this.windSpeed < 12) {
+      return `Brisa suave${direction}, apenas perceptible.`;
+    }
+
+    if (this.windSpeed < 30) {
+      return `Viento moderado${direction}, puede mover ramas y papeles.`;
+    }
+
+    return `Viento fuerte${direction}, tomá precauciones al aire libre.`;
+  }
+
+  get rainStatusLabel(): string {
+    if (this.rainProbabilityToday === null) {
+      return 'Sin datos';
+    }
+
+    if (this.rainProbabilityToday < 30) {
+      return 'Poco probable';
+    }
+
+    if (this.rainProbabilityToday < 70) {
+      return 'Posible';
+    }
+
+    return 'Muy probable';
+  }
+
+  get rainDescription(): string {
+    if (this.rainProbabilityToday === null) {
+      return 'Sin datos disponibles.';
+    }
+
+    if (this.rainProbabilityToday < 30) {
+      return 'Baja probabilidad de precipitaciones hoy.';
+    }
+
+    if (this.rainProbabilityToday < 70) {
+      return 'Podrían registrarse lluvias en algún momento del día.';
+    }
+
+    return 'Alta probabilidad de lluvia, llevá paraguas.';
+  }
+
+  get cloudCoverStatusLabel(): string {
+    if (this.cloudCover === null) {
+      return 'Sin datos';
+    }
+
+    if (this.cloudCover < 20) {
+      return 'Despejado';
+    }
+
+    if (this.cloudCover < 70) {
+      return 'Parcialmente nublado';
+    }
+
+    return 'Nublado';
+  }
+
+  get cloudCoverDescription(): string {
+    if (this.cloudCover === null) {
+      return 'Sin datos disponibles.';
+    }
+
+    if (this.cloudCover < 20) {
+      return 'Cielo mayormente despejado durante el día.';
+    }
+
+    if (this.cloudCover < 70) {
+      return 'Alternancia entre sol y nubes a lo largo del día.';
+    }
+
+    return 'Cielo cubierto de nubes la mayor parte del día.';
   }
 
   get weatherThemeClass(): string {
@@ -601,6 +788,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           this.windDirection = weather.windDirection;
           this.windDirectionDegrees = weather.windDirectionDegrees;
           this.uvIndex = weather.uvIndex;
+          this.cloudCover = weather.cloudCover;
           this.rainProbabilityToday = weather.rainProbabilityToday;
           this.currentTimeLabel = weather.currentTimeLabel;
           this.forecast24h = weather.hourly24h;
@@ -630,6 +818,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.windDirection = null;
     this.windDirectionDegrees = null;
     this.uvIndex = null;
+    this.cloudCover = null;
     this.rainProbabilityToday = null;
     this.forecast24h = [];
     this.dailyForecast = [];

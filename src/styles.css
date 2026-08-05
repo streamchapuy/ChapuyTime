@@ -597,6 +597,77 @@ app-home .weather-rain-row strong {
 	font-weight: 700;
 }
 
+app-home .weather-details-extra {
+	width: min(1120px, calc(100% - 16px));
+	max-width: 100%;
+	margin: 0 auto;
+	padding: 0 calc(8px + env(safe-area-inset-right, 0px)) 22px calc(8px + env(safe-area-inset-left, 0px));
+	position: relative;
+	z-index: 1;
+}
+
+app-home .weather-details-extra-title {
+	margin: 0 0 12px;
+	font-family: 'Space Grotesk', sans-serif;
+	font-size: 1rem;
+	font-weight: 700;
+	color: #f4f8fb;
+}
+
+app-home .weather-details-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px;
+}
+
+app-home .weather-detail-card {
+	min-width: 0;
+	border-radius: 22px;
+	padding: 16px;
+	background: rgba(229, 240, 252, 0.12);
+	border: 1px solid rgba(244, 248, 251, 0.16);
+	color: #f4f8fb;
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.16),
+		0 18px 40px rgba(4, 22, 38, 0.16);
+}
+
+app-home .weather-detail-title {
+	display: block;
+	font-size: 0.68rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	opacity: 0.72;
+}
+
+app-home .weather-detail-value {
+	display: block;
+	margin-top: 8px;
+	font-family: 'Space Grotesk', sans-serif;
+	font-size: 1.7rem;
+	font-weight: 700;
+}
+
+app-home .weather-detail-status {
+	margin: 6px 0 0;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: #ffd873;
+}
+
+app-home .weather-detail-desc {
+	margin: 4px 0 0;
+	font-size: 0.76rem;
+	line-height: 1.35;
+	opacity: 0.78;
+}
+
+@media (max-width: 380px) {
+	app-home .weather-details-grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
 app-home .details-main {
 	width: min(1120px, calc(100% - 16px));
 	max-width: 100%;

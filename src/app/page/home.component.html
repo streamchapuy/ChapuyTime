@@ -83,40 +83,57 @@
           <strong>{{ minTemperature !== null ? minTemperature + '°' : '--' }}</strong>
         </div>
       </div>
-
-      <hr class="weather-divider" />
-
-      <div class="weather-rain-row">
-        <span>Probabilidad de lluvia</span>
-        <strong>{{ rainProbabilityToday !== null ? rainProbabilityToday + '%' : '--' }}</strong>
-      </div>
-
-      <hr class="weather-divider" />
-
-      <div class="weather-uvwind-row">
-        <div class="weather-stat">
-          <span>Índice UV</span>
-          <strong>{{ uvLevelLabel }}</strong>
-        </div>
-        <div class="weather-stat">
-          <span>Viento</span>
-          <strong>{{ windSpeed !== null ? windSpeed + ' km/h' : '--' }}</strong>
-        </div>
-      </div>
-
-      <hr class="weather-divider" />
-
-      <div class="weather-uvwind-row">
-        <div class="weather-stat">
-          <span>Humedad</span>
-          <strong>{{ humidity !== null ? humidity + '%' : '--' }}</strong>
-        </div>
-        <div class="weather-stat">
-          <span>Dirección viento</span>
-          <strong>{{ windDirection !== null ? windDirection : '--' }}</strong>
-        </div>
-      </div>
     </article>
+  </section>
+
+  <section id="detalles-clima" class="weather-details-extra shell" aria-label="Detalles adicionales del clima">
+    <h3 class="weather-details-extra-title">Detalles del tiempo</h3>
+
+    <div class="weather-details-grid">
+      <article class="weather-detail-card glass-card">
+        <span class="weather-detail-title">Sensación térmica</span>
+        <strong class="weather-detail-value">{{ feelsLikeTemperature !== null ? feelsLikeTemperature + '°' : '--' }}</strong>
+        <p class="weather-detail-status">{{ feelsLikeStatusLabel }}</p>
+        <p class="weather-detail-desc">{{ feelsLikeDescription }}</p>
+      </article>
+
+      <article class="weather-detail-card glass-card">
+        <span class="weather-detail-title">Humedad</span>
+        <strong class="weather-detail-value">{{ humidity !== null ? humidity + '%' : '--' }}</strong>
+        <p class="weather-detail-status">{{ humidityStatusLabel }}</p>
+        <p class="weather-detail-desc">{{ humidityDescription }}</p>
+      </article>
+
+      <article class="weather-detail-card glass-card">
+        <span class="weather-detail-title">Viento</span>
+        <strong class="weather-detail-value">
+          {{ windSpeed !== null ? windSpeed + ' km/h' : '--' }}{{ windDirection ? ' ' + windDirection : '' }}
+        </strong>
+        <p class="weather-detail-status">{{ windStatusLabel }}</p>
+        <p class="weather-detail-desc">{{ windDescription }}</p>
+      </article>
+
+      <article class="weather-detail-card glass-card">
+        <span class="weather-detail-title">Índice UV</span>
+        <strong class="weather-detail-value">{{ uvIndex !== null ? uvIndex : '--' }}</strong>
+        <p class="weather-detail-status">{{ uvLevelLabel }}</p>
+        <p class="weather-detail-desc">{{ uvStatusDescription }}</p>
+      </article>
+
+      <article class="weather-detail-card glass-card">
+        <span class="weather-detail-title">Probabilidad de lluvia</span>
+        <strong class="weather-detail-value">{{ rainProbabilityToday !== null ? rainProbabilityToday + '%' : '--' }}</strong>
+        <p class="weather-detail-status">{{ rainStatusLabel }}</p>
+        <p class="weather-detail-desc">{{ rainDescription }}</p>
+      </article>
+
+      <article class="weather-detail-card glass-card">
+        <span class="weather-detail-title">Cubierta de nubes</span>
+        <strong class="weather-detail-value">{{ cloudCover !== null ? cloudCover + '%' : '--' }}</strong>
+        <p class="weather-detail-status">{{ cloudCoverStatusLabel }}</p>
+        <p class="weather-detail-desc">{{ cloudCoverDescription }}</p>
+      </article>
+    </div>
   </section>
 
   <section id="pronostico" class="details-main shell" aria-label="Detalle de clima">
